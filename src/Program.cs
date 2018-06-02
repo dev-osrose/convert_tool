@@ -17,18 +17,17 @@ namespace convert_tool
       DataFile dataFile = new DataFile();
       dataFile.Load(zoneStb);
 
-      //Console.Write("mob(<npc_id>, <map_id>, <x_pos>, <y_pos>, <angle>);\n");
-      Console.Write("npc(<npc_id>, <map_id>, <x_pos>, <y_pos>, <angle>);\n");
-      Console.Write("warp_gate(<gate_to>, <this_gate_id>, <map_id>, <x_pos>, <y_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n\n");
+      Console.Write("npc(<npc_lua_file>, <map_id>, <npc_id>, <x_pos>, <y_pos>, <angle>);\n");
+      Console.Write("mob(<mob_spawner_alias>, <map_id>, <mob_id>, <mob_count>, <spawner_limit>, <spawner_interval>, <spawner_range>, <x_pos>, <y_pos>, <angle>);\n");
+      Console.Write("warp_gate(<warp_alias>, <gate_to>, <this_gate_id>, <map_id>, <x_pos>, <y_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n\n");
 
-      for (int i = 1; i < dataFile.RowCount; i++)
+      for (var i = 1; i < dataFile.RowCount; i++)
       {
-        if (dataFile[i][2].ToString().Contains(".zon"))
-        {
-          Console.Write("Attempting to load \"" + dataFile[i][1].ToString() + "\" - ");
-          var zone = new ZoneData();
-          zone.Load(dataFile[i][2].ToString(), i);
-        }
+        if (!dataFile[i][2].ToString().Contains(".zon")) continue;
+
+        Console.Write("Attempting to load \"" + dataFile[i][1].ToString() + "\" - ");
+        var zone = new ZoneData();
+        zone.Load(dataFile[i][2].ToString(), i);
       }
 
       Console.ReadLine();
