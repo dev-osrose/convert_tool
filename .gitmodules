@@ -1,0 +1,3 @@
+[submodule "3rdparty/Revise"]
+	path = 3rdparty/Revise
+	url = https://github.com/jackwakefield/Revise.git
