@@ -24,7 +24,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Revise.Files.IFO;
+using Revise.Files.STB;
 using Revise.Files.ZON;
+using SharpDX;
 
 namespace convert_tool
 {
@@ -88,39 +90,49 @@ namespace convert_tool
         ExtractWarpGates(warpList, mapId, ifo, blockX, blockY);
       }
 
-      var luaFile = new System.IO.StreamWriter("scripts\\warps\\" + fileName + ".lua", false);
-      using (luaFile)
+      if (warpList.Count > 0)
       {
-        luaFile.Write("--[[ WARP LIST\n");
-        luaFile.Write(
-          "warp_gate(<warp_alias>, <gate_to>, <map_id>, <x_pos>, <y_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n");
-        luaFile.Write("--]]\n");
-        foreach (var mapObj in warpList)
-          luaFile.Write(mapObj);
+        var luaFile = new System.IO.StreamWriter("scripts\\warps\\" + fileName + ".lua", false);
+        using (luaFile)
+        {
+          luaFile.Write("--[[ WARP LIST\n");
+          luaFile.Write(
+            "warp_gate(<warp_alias>, <dest_map_id>, <dest_x_pos>, <dest_y_pos>, <dest_z_pos>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n");
+          luaFile.Write("--]]\n");
+          foreach (var mapObj in warpList)
+            luaFile.Write(mapObj);
+        }
       }
 
-      luaFile = new System.IO.StreamWriter("scripts\\npcs\\" + fileName + ".lua", false);
-      using (luaFile)
+      if(npcList.Count > 0)
       {
-        luaFile.WriteLine();
-        luaFile.WriteLine();
-        luaFile.Write("--[[ NPC SPAWN LIST\n");
-        luaFile.Write("npc(<npc_lua_file>, <map_id>, <npc_id>, <x_pos>, <y_pos>, <angle>);\n");
-        luaFile.Write("--]]\n");
-        foreach (var mapObj in npcList)
-          luaFile.Write(mapObj);
+        var luaFile = new System.IO.StreamWriter("scripts\\npcs\\" + fileName + ".lua", false);
+        using (luaFile)
+        {
+          luaFile.WriteLine();
+          luaFile.WriteLine();
+          luaFile.Write("--[[ NPC SPAWN LIST\n");
+          luaFile.Write("npc(<npc_lua_file>, <npc_id>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>);\n");
+          luaFile.Write("--]]\n");
+          foreach (var mapObj in npcList)
+            luaFile.Write(mapObj);
+        }
       }
 
-      luaFile = new System.IO.StreamWriter("scripts\\mobs\\" + fileName + ".lua", false);
-      using (luaFile)
+      if(mobList.Count > 0)
       {
-        luaFile.WriteLine();
-        luaFile.WriteLine();
-        luaFile.Write("--[[ MOB SPAWN LIST\n");
-        luaFile.Write("mob(<mob_spawner_alias>, <map_id>, <mob_id>, <mob_count>, <spawner_limit>, <spawn_interval>, <spawner_range>, <x_pos>, <y_pos>);\n");
-        luaFile.Write("--]]\n");
-        foreach (var mapObj in mobList)
-          luaFile.Write(mapObj);
+        var luaFile = new System.IO.StreamWriter("scripts\\mobs\\" + fileName + ".lua", false);
+        using (luaFile)
+        {
+          luaFile.WriteLine();
+          luaFile.WriteLine();
+          luaFile.Write("--[[ MOB SPAWN LIST\n");
+          luaFile.Write(
+            "mob(<mob_spawner_alias>, <mob_id>, <mob_count>, <spawner_limit>, <spawn_interval>, <spawner_range>, <map_id>, <x_pos>, <y_pos>, <z_pos>,);\n");
+          luaFile.Write("--]]\n");
+          foreach (var mapObj in mobList)
+            luaFile.Write(mapObj);
+        }
       }
 
       Console.Write("\n\n");
@@ -130,30 +142,34 @@ namespace convert_tool
     {
       foreach (var mobSpawns in ifo.MonsterSpawns)
       {
+        var adjPosCoords = new Vector3(((mobSpawns.Position.X + 520000.00f) / 100.0f), ((mobSpawns.Position.Y + 520000.00f) / 100.0f), ((mobSpawns.Position.Z) / 100.0f));
         foreach (var normalMobs in mobSpawns.NormalSpawnPoints)
         {
+
           mobList.Add("mob(\"\", "
-                        + mapId.ToString() + ", "
                         + normalMobs.Monster.ToString() + ", "
                         + normalMobs.Count.ToString() + ", "
                         + mobSpawns.Limit.ToString() + ", "
                         + mobSpawns.Interval.ToString() + ", "
                         + mobSpawns.Range.ToString() + ", "
-                        + (blockX + mobSpawns.MapPosition.X).ToString() + ", "
-                        + (blockY + mobSpawns.MapPosition.Y).ToString() + ");\n");
+                        + mapId.ToString() + ", "
+                        + (adjPosCoords.X).ToString() + "f, "
+                        + (adjPosCoords.Y).ToString() + "f, "
+                        + (adjPosCoords.Z).ToString() + "f);\n");
         }
 
         foreach (var tacticalMobs in mobSpawns.TacticalSpawnPoints)
         {
           mobList.Add("mob(\"\", "
-                        + mapId.ToString() + ", "
                         + tacticalMobs.Monster.ToString() + ", "
                         + tacticalMobs.Count.ToString() + ", "
                         + mobSpawns.Limit.ToString() + ", "
                         + mobSpawns.Interval.ToString() + ", "
                         + mobSpawns.Range.ToString() + ", "
-                        + (blockX + mobSpawns.MapPosition.X).ToString() + ", "
-                        + (blockY + mobSpawns.MapPosition.Y).ToString() + ");\n");
+                        + mapId.ToString() + ", "
+                        + (adjPosCoords.X).ToString() + "f, "
+                        + (adjPosCoords.Y).ToString() + "f, "
+                        + (adjPosCoords.Z).ToString() + "f);\n");
         }
       }
     }
@@ -162,24 +178,58 @@ namespace convert_tool
     {
       foreach (var npc in ifo.NPCs)
       {
+        var adjPosCoords = new Vector3(((npc.Position.X + 520000.00f) / 100.0f), ((npc.Position.Y + 520000.00f) / 100.0f), ((npc.Position.Z) / 100.0f));
         npcList.Add("npc(\"\", "
-                      + mapId.ToString() + ", "
                       + npc.ObjectID.ToString() + ", "
-                      + (blockX + npc.MapPosition.X).ToString() + ", "
-                      + (blockY + npc.MapPosition.Y).ToString() + ", "
+                      + mapId.ToString() + ", "
+                      + (adjPosCoords.X).ToString() + "f, "
+                      + (adjPosCoords.Y).ToString() + "f, "
+                      + (adjPosCoords.Z).ToString() + "f, "
                       + npc.Rotation.Angle + "f);\n");
       }
     }
 
     private static void ExtractWarpGates(List<string> warpList, int mapId, MapDataFile ifo, int blockX, int blockY)
     {
+      const string warpStb = "./3DDATA/stb/warp.stb";
+      const string zoneStb = "./3DDATA/stb/list_zone.stb";
+
+      var zoneDataFile = new DataFile();
+      zoneDataFile.Load(zoneStb);
+
+      var warpDataFile = new DataFile();
+      warpDataFile.Load(warpStb);
+      var destCoords = Vector3.Zero;
+
       foreach (var warpGate in ifo.WarpPoints)
       {
+        var destMapId = int.Parse(warpDataFile[warpGate.WarpID][2]);
+        if (zoneDataFile[destMapId][2].ToString().Contains(".zon"))
+        {
+          ZoneFile zoneFile = new ZoneFile();
+          zoneFile.Load(zoneDataFile[destMapId][2].ToString()); // Load the zon file
+
+          foreach (var spawnPoint in zoneFile.SpawnPoints)
+          {
+            if (spawnPoint.Name != warpDataFile[warpGate.WarpID][3].ToString()) continue;
+
+            // rose is stupid and we need to do this to get the right coords
+            destCoords = new Vector3(((spawnPoint.Position.X + 520000.00f) / 100.0f), ((spawnPoint.Position.Z + 520000.00f) / 100.0f), ((spawnPoint.Position.Y) / 100.0f));
+            break;
+          }
+        }
+
+        var gateCoords = new Vector3(((warpGate.Position.X + 520000.00f) / 100.0f), ((warpGate.Position.Y + 520000.00f) / 100.0f), ((warpGate.Position.Z) / 100.0f));
+
         warpList.Add("warp_gate(\"\", " 
+                      + warpDataFile[warpGate.WarpID][2].ToString() + ", "
+                      + (destCoords.X) + "f, "
+                      + (destCoords.Y) + "f, "
+                      + (destCoords.Z) + "f, "
                       + mapId.ToString() + ", "
-                      + warpGate.WarpID.ToString() + ", "
-                      + (blockX + warpGate.MapPosition.X).ToString() + ", "
-                      + (blockY + warpGate.MapPosition.Y).ToString() + ", "
+                      + (gateCoords.X) + "f, "
+                      + (gateCoords.Y) + "f, "
+                      + (gateCoords.Z) + "f, "
                       + warpGate.Rotation.Angle + "f, "
                       + warpGate.Scale.X + "f, "
                       + warpGate.Scale.Y + "f, "

@@ -12,9 +12,9 @@ namespace convert_tool
   {
     static void Main(string[] args)
     {
-      string zoneStb = "./3DDATA/stb/list_zone.stb";
+      const string zoneStb = "./3DDATA/stb/list_zone.stb";
 
-      DataFile dataFile = new DataFile();
+      var dataFile = new DataFile();
       dataFile.Load(zoneStb);
 
       Console.Write("npc(<npc_lua_file>, <map_id>, <npc_id>, <x_pos>, <y_pos>, <angle>);\n");
