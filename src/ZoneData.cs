@@ -1,24 +1,23 @@
-﻿// Copyright 2018 Chirstopher Torres (Raven)
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-// http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// 
-// 
-// \file ZoneData.cs
-// \brief 
-//  
-// \author 
-// \date 06 2018
-//  
+﻿#region License
+
+/**
+ * Copyright (C) 2018 Chirstopher Torres (Raven)
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#endregion
 
 using System;
 using System.Collections.Generic;
@@ -39,14 +38,14 @@ namespace convert_tool
       if (filePath == null)
         return;
 
-      string directoryPath = Path.GetDirectoryName(filePath);
-      string fileName = Path.GetFileNameWithoutExtension(filePath);
-      ZoneFile zoneFile = new ZoneFile();
+      var directoryPath = Path.GetDirectoryName(filePath);
+      var fileName = Path.GetFileNameWithoutExtension(filePath);
+      var zoneFile = new ZoneFile();
       try
       {
         zoneFile.Load(filePath);
       }
-      catch (FileNotFoundException e)
+      catch (FileNotFoundException)
       {
         Console.Write("Failed!\n");
         return;
@@ -67,7 +66,7 @@ namespace convert_tool
           {
             mapDataFile[x, y].Load(directoryPath + "\\" + y + "_" + x + ".ifo");
           }
-          catch (FileNotFoundException e)
+          catch (FileNotFoundException)
           {
             continue;
           }
@@ -85,9 +84,9 @@ namespace convert_tool
         var blockX = ifo.ZonePosition.X * PostionModifier;
         var blockY = ifo.ZonePosition.Y * PostionModifier;
 
-        ExtractNpcs(npcList, mapId, ifo, blockX, blockY);
-        ExtractMobs(mobList, mapId, ifo, blockX, blockY);
-        ExtractWarpGates(warpList, mapId, ifo, blockX, blockY);
+        ExtractNpcs(npcList, mapId, ifo);
+        ExtractMobs(mobList, mapId, ifo);
+        ExtractWarpGates(warpList, mapId, ifo);
       }
 
       if (warpList.Count > 0)
@@ -138,7 +137,7 @@ namespace convert_tool
       Console.Write("\n\n");
     }
 
-    private static void ExtractMobs(List<string> mobList, int mapId, MapDataFile ifo, int blockX, int blockY)
+    private static void ExtractMobs(List<string> mobList, int mapId, MapDataFile ifo)
     {
       foreach (var mobSpawns in ifo.MonsterSpawns)
       {
@@ -174,7 +173,7 @@ namespace convert_tool
       }
     }
 
-    private static void ExtractNpcs(List<string> npcList, int mapId, MapDataFile ifo, int blockX, int blockY)
+    private static void ExtractNpcs(List<string> npcList, int mapId, MapDataFile ifo)
     {
       foreach (var npc in ifo.NPCs)
       {
@@ -189,7 +188,7 @@ namespace convert_tool
       }
     }
 
-    private static void ExtractWarpGates(List<string> warpList, int mapId, MapDataFile ifo, int blockX, int blockY)
+    private static void ExtractWarpGates(List<string> warpList, int mapId, MapDataFile ifo)
     {
       const string warpStb = "./3DDATA/stb/warp.stb";
       const string zoneStb = "./3DDATA/stb/list_zone.stb";
