@@ -65,10 +65,11 @@ namespace convert_tool
       itemDataFiles[12].set("list_questitem.stb", "list_questitem_s.stl");
       itemDataFiles[13].set("list_pat.stb", "list_pat_s.stl");
 
+      int typeIdx = 0;
       foreach (var itemDataFile in itemDataFiles)
       {
         var itemData = new ItemData();
-        itemData.Load(stbRoot + itemDataFile.DataFile, stbRoot + itemDataFile.StringFile);
+        itemData.Load(++typeIdx, stbRoot + itemDataFile.DataFile, stbRoot + itemDataFile.StringFile);
       }
 
       //"list_skill.stb";
