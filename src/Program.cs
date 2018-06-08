@@ -66,10 +66,12 @@ namespace convert_tool
       itemDataFiles[13].set("list_pat.stb", "list_pat_s.stl");
 
       int typeIdx = 0;
+      var sqlFile = new System.IO.StreamWriter("item_db.sql", false);
+      sqlFile.Close();
       foreach (var itemDataFile in itemDataFiles)
       {
         var itemData = new ItemData();
-        itemData.Load(++typeIdx, stbRoot + itemDataFile.DataFile, stbRoot + itemDataFile.StringFile);
+        itemData.Load((ItemData.ItemType) (++typeIdx), stbRoot + itemDataFile.DataFile, stbRoot + itemDataFile.StringFile);
       }
 
       //"list_skill.stb";

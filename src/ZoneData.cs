@@ -152,9 +152,9 @@ namespace convert_tool
                         + mobSpawns.Interval.ToString() + ", "
                         + mobSpawns.Range.ToString() + ", "
                         + mapId.ToString() + ", "
-                        + (adjPosCoords.X).ToString() + "f, "
-                        + (adjPosCoords.Y).ToString() + "f, "
-                        + (adjPosCoords.Z).ToString() + "f);\n");
+                        + (adjPosCoords.X).ToString() + ", "
+                        + (adjPosCoords.Y).ToString() + ", "
+                        + (adjPosCoords.Z).ToString() + ");\n");
         }
 
         foreach (var tacticalMobs in mobSpawns.TacticalSpawnPoints)
@@ -166,9 +166,9 @@ namespace convert_tool
                         + mobSpawns.Interval.ToString() + ", "
                         + mobSpawns.Range.ToString() + ", "
                         + mapId.ToString() + ", "
-                        + (adjPosCoords.X).ToString() + "f, "
-                        + (adjPosCoords.Y).ToString() + "f, "
-                        + (adjPosCoords.Z).ToString() + "f);\n");
+                        + (adjPosCoords.X).ToString() + ", "
+                        + (adjPosCoords.Y).ToString() + ", "
+                        + (adjPosCoords.Z).ToString() + ");\n");
         }
       }
     }
@@ -181,10 +181,10 @@ namespace convert_tool
         npcList.Add("npc(\"\", "
                       + npc.ObjectID.ToString() + ", "
                       + mapId.ToString() + ", "
-                      + (adjPosCoords.X).ToString() + "f, "
-                      + (adjPosCoords.Y).ToString() + "f, "
-                      + (adjPosCoords.Z).ToString() + "f, "
-                      + npc.Rotation.Angle + "f);\n");
+                      + (adjPosCoords.X).ToString() + ", "
+                      + (adjPosCoords.Y).ToString() + ", "
+                      + (adjPosCoords.Z).ToString() + ", "
+                      + npc.Rotation.Angle + ");\n");
       }
     }
 
@@ -222,17 +222,17 @@ namespace convert_tool
 
         warpList.Add("warp_gate(\"\", " 
                       + warpDataFile[warpGate.WarpID][2].ToString() + ", "
-                      + (destCoords.X) + "f, "
-                      + (destCoords.Y) + "f, "
-                      + (destCoords.Z) + "f, "
+                      + (destCoords.X) + ", "
+                      + (destCoords.Y) + ", "
+                      + (destCoords.Z) + ", "
                       + mapId.ToString() + ", "
-                      + (gateCoords.X) + "f, "
-                      + (gateCoords.Y) + "f, "
-                      + (gateCoords.Z) + "f, "
-                      + warpGate.Rotation.Angle + "f, "
-                      + warpGate.Scale.X + "f, "
-                      + warpGate.Scale.Y + "f, "
-                      + warpGate.Scale.Z + "f);\n");
+                      + (gateCoords.X) + ", "
+                      + (gateCoords.Y) + ", "
+                      + (gateCoords.Z) + ", "
+                      + warpGate.Rotation.Angle + ", "
+                      + warpGate.Scale.X + ", "
+                      + warpGate.Scale.Y + ", "
+                      + warpGate.Scale.Z + ");\n");
       }
     }
   }

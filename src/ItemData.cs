@@ -19,6 +19,7 @@
 
 #endregion
 
+//#define OUTPUT_STB_DATA_COMMENT
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,7 +31,7 @@ namespace convert_tool
 {
   public class ItemData
   {
-    enum ItemType : int {
+    public enum ItemType : int {
       FACE = 1,
       CAP,
       BODY,
@@ -48,7 +49,7 @@ namespace convert_tool
       MAX_ITEM_TYPES
     };
 
-    public void Load(int type = 0, string stbPath = null, string stlPath = null)
+    public void Load(ItemType type = 0, string stbPath = null, string stlPath = null)
     {
       if (type == 0 || stbPath == null || stlPath == null)
         return;
@@ -70,7 +71,7 @@ namespace convert_tool
         return;
       }
       Console.Write("Successful!\n");
-
+      List<string> sqlFileList = new List<string>();
       for (var i = 0; i < dataFile.RowCount; i++)
       {
         StringTableRow strTableRow;
@@ -90,59 +91,72 @@ namespace convert_tool
         if(itemName.Length == 0 || itemDesc.Length == 0) continue;
 
         string script = "";
+        List<string> reqTable = new List<string>();
+        List<string> bonusTable = new List<string>();
         double priceSell = 0.0f;
         int subtype, priceBuy, weight, attack, defense, range, slots, equipJobs, groundViewModel, durability, attackSpeed, magic, moveSpeed, usageRestrictions;
         subtype = priceBuy = weight = attack = defense = range = slots = equipJobs = groundViewModel = durability = attackSpeed = magic = moveSpeed = usageRestrictions = 0;
+        
+        int.TryParse(curRow[4], out usageRestrictions);
+        int.TryParse(curRow[5], out subtype);
+        int.TryParse(curRow[6], out priceBuy);
+        double.TryParse(curRow[7], out priceSell);
+        int.TryParse(curRow[8], out weight);
+
+        int.TryParse(curRow[11], out groundViewModel);
+        int.TryParse(curRow[17], out equipJobs);
+
         try
         {
-          int.TryParse(curRow[3], out usageRestrictions);
-          int.TryParse(curRow[4], out subtype);
-          int.TryParse(curRow[5], out priceBuy);
-          double.TryParse(curRow[6], out priceSell);
-          int.TryParse(curRow[7], out weight);
-
-          int.TryParse(curRow[10], out groundViewModel);
-          int.TryParse(curRow[16], out equipJobs);
-
           for (var reqIndex = 0; reqIndex < 2; reqIndex++)
           {
-            var type = curRow[(19 + (reqIndex * 2))];
-            var value = curRow[(20 + (reqIndex * 2))];
+            var reqType = curRow[(20 + (reqIndex * 2))];
+            var value = curRow[(21 + (reqIndex * 2))];
 
-            if (type.Length == 0) continue;
+            if (reqType.Length == 0) continue;
+
+            var reqId = "reqTable[" + (reqIndex + 1) + "]";
+            reqTable.Add(reqId + " = {}\n" +
+                         reqId + ".type = " + reqType + "\n" +
+                         reqId + ".value = " + value + "\n");
           }
 
           for (var bonusIndex = 0; bonusIndex < 2; bonusIndex++)
           {
-            var type = curRow[(24 + (bonusIndex * 3))];
-            var value = curRow[(25 + (bonusIndex * 3))];
+            var bonusType = curRow[(25 + (bonusIndex * 3))];
+            var value = curRow[(26 + (bonusIndex * 3))];
 
-            if (type.Length == 0) continue;
+            if (bonusType.Length == 0) continue;
+
+            var bonusId = "bonusTable[" + (bonusIndex + 1) + "]";
+            reqTable.Add(bonusId + " = {}\n" +
+                         bonusId + ".type = " + bonusType + "\n" +
+                         bonusId + ".value = " + value + "\n");
           }
 
-          int.TryParse(curRow[29], out durability);
-          int.TryParse(curRow[31], out defense);
+          int.TryParse(curRow[30], out durability);
+          int.TryParse(curRow[32], out defense);
 
           switch (type)
           {
-            case ItemType::BACK:
-            case ItemType::FOOT:
+            case ItemType.BACK:
+            case ItemType.FOOT:
             {
-              int.TryParse(curRow[33], out moveSpeed);
+              int.TryParse(curRow[34], out moveSpeed);
               break;
             }
-            case ItemType::WEAPON: 
+            case ItemType.WEAPON: 
             {
-              int.TryParse(curRow[30], out slots);
-              int.TryParse(curRow[33], out range);
-              int.TryParse(curRow[35], out attack);
-              int.TryParse(curRow[36], out attackSpeed);
-              int.TryParse(curRow[37], out magic);
+              int.TryParse(curRow[31], out slots);
+              int.TryParse(curRow[34], out range);
+              int.TryParse(curRow[36], out attack);
+              int.TryParse(curRow[37], out attackSpeed);
+              int.TryParse(curRow[38], out magic);
               break;
             }
-            case ItemType::SUB_WEAPON: 
+            case ItemType.SUB_WEAPON: 
             {
-              int.TryParse(curRow[30], out slots);
+              int.TryParse(curRow[31], out slots);
               break;
             }
             default:
@@ -151,8 +165,93 @@ namespace convert_tool
         }
         catch (ArgumentOutOfRangeException e)
         {
-          Console.WriteLine(e);
-          continue;
+          //Console.WriteLine(e);
+          //Shit borked..... naaaa just this STB prob doesn't have extra data in it
+        }
+
+#if OUTPUT_STB_DATA_COMMENT
+        script += "--[[ ";
+        for (var j = 0; j < dataFile.ColumnCount - 1; j++)
+        {
+          script += "COLUMN " + j+1 + " =='" + curRow[j+1] + "'\n";
+        }
+        script += "--]]\n\n";
+#endif
+
+
+
+        script += "use_restriction = " + usageRestrictions + "\n";
+
+        foreach (var requirement in reqTable)
+        {
+          script += requirement;
+        }
+
+        foreach (var bonus in bonusTable)
+        {
+          script += bonus;
+        }
+
+        script +=
+          @"
+function OnInit()
+  return true
+end
+
+function OnCreate()
+  return true
+end
+
+function OnDelete()
+  return true
+end
+
+function OnEquip(entity)
+  for i, data in ipairs(reqTable) do
+    if data.value > getAttr(entity, data.type) then
+      return false
+    end
+  end
+
+  for i, data in ipairs(bonusTable) do
+    addBonusAttr(entity, data.type, data.value)
+  end
+  return true
+end
+
+function OnUnequip(entity)
+  for i, data in ipairs(bonusTable) do
+    removeBonusAttr(entity, data.type, data.value)
+  end
+  return true
+end
+
+function OnDrop(entity)
+  return true
+end
+
+function OnPickup(entity)
+  return true
+end
+
+function OnUse(entity)
+  return true
+end";
+
+        itemDesc = itemDesc.Replace("\"", "\\\"");
+        string sqlEntry =
+          "REPLACE into item_db(id, name, `desc`, type, subtype, price_buy, price_sell, weight, attack, defense, `range`, slots, equip_jobs, view_id, script) ";
+        sqlEntry += "values(" + i + ", \"" + itemName + "\", \"" + itemDesc + "\", " + (int)(type) + ", " + subtype + ", " + priceBuy + ", " + priceSell + ", " + weight + ", " + attack + ", " + defense + ", " + range + ", " + slots + ", " + equipJobs + ", " + groundViewModel + ", \"" + script + "\");";
+
+        sqlFileList.Add(sqlEntry);
+      }
+
+      var sqlFile = new System.IO.StreamWriter("item_db.sql", true);
+      using (sqlFile)
+      {
+        foreach (var itemLine in sqlFileList)
+        {
+          sqlFile.WriteLine(itemLine);
         }
       }
     }
