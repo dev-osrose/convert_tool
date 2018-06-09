@@ -26,10 +26,10 @@ namespace convert_tool
 {
   internal class Program
   {
-    struct ItemInfo
+    private struct ItemInfo
     {
-      public string DataFile { get; set; }
-      public string StringFile { get; set; }
+      public string DataFile { get; private set; }
+      public string StringFile { get; private set; }
 
       public ItemInfo(string dataFile, string stringFile)
       {

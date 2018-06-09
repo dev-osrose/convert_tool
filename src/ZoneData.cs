@@ -22,6 +22,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Revise.Files.CON;
 using Revise.Files.IFO;
 using Revise.Files.STB;
 using Revise.Files.ZON;
@@ -177,14 +178,26 @@ namespace convert_tool
     {
       foreach (var npc in ifo.NPCs)
       {
+        var eventDataFile = new DataFile();
+        eventDataFile.Load("./3DDATA/stb/list_event.stb");
+        int dialogId = 0;
+        for (int i = 0; i < eventDataFile.RowCount; i++)
+        {
+          if (eventDataFile[i][0] == npc.ConversationFile)
+          {
+            dialogId = i;
+            break;
+          }
+        }
+
         var adjPosCoords = new Vector3(((npc.Position.X + 520000.00f) / 100.0f), ((npc.Position.Y + 520000.00f) / 100.0f), ((npc.Position.Z) / 100.0f));
-        npcList.Add("npc(\"\", "
+        npcList.Add("npc(\"" + dialogId + "\", "
                       + npc.ObjectID.ToString() + ", "
                       + mapId.ToString() + ", "
                       + (adjPosCoords.X).ToString() + ", "
                       + (adjPosCoords.Y).ToString() + ", "
                       + (adjPosCoords.Z).ToString() + ", "
-                      + npc.Rotation.Angle + ");\n");
+                      + (npc.Rotation.Angle * (180.0 / Math.PI)) + ");\n");
       }
     }
 
