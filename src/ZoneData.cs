@@ -22,6 +22,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using Revise.Files.CON;
 using Revise.Files.IFO;
 using Revise.Files.STB;
@@ -107,9 +108,24 @@ namespace convert_tool
         ExtractWarpGates(warpList, mapId, ifo);
       }
 
+      var catagoryName = "field";
+      Regex townRgx = new Regex(@"^[a-zA-Z][a-zA-Z]T\d{2}$"); // matches '<2 chars>T<2 numbers>'
+      if(fileName.Contains("PVP")) 
+      {
+        catagoryName = "pvp";
+      }
+      else if(townRgx.IsMatch(fileName))
+      {
+        catagoryName = "cities";
+      }
+
+      var luaList = new List<string>();
       if (spawnList.Count > 0)
       {
-        var luaFile = new System.IO.StreamWriter("scripts\\spawns\\" + fileName + ".lua", false);
+        var outFilePath = "scripts\\spawns\\" + catagoryName + "\\" + fileName + ".lua";
+        (new FileInfo(outFilePath)).Directory.Create();
+        var luaFile = new System.IO.StreamWriter(outFilePath, false);
+        luaList.Add("include(\""+ outFilePath + "\");\n");
         using (luaFile)
         {
           luaFile.Write("--[[ SPAWN LIST\n");
@@ -125,7 +141,10 @@ namespace convert_tool
 
       if (warpList.Count > 0)
       {
-        var luaFile = new System.IO.StreamWriter("scripts\\warps\\" + fileName + ".lua", false);
+        var outFilePath = "scripts\\warps\\" + catagoryName + "\\" + fileName + ".lua";
+        (new FileInfo(outFilePath)).Directory.Create();
+        var luaFile = new System.IO.StreamWriter(outFilePath, false);
+        luaList.Add("include(\""+ outFilePath + "\");\n");
         using (luaFile)
         {
           luaFile.Write("--[[ WARP LIST\n");
@@ -139,7 +158,10 @@ namespace convert_tool
 
       if(npcList.Count > 0)
       {
-        var luaFile = new System.IO.StreamWriter("scripts\\npcs\\" + fileName + ".lua", false);
+        var outFilePath = "scripts\\npcs\\" + catagoryName + "\\" + fileName + ".lua";
+        (new FileInfo(outFilePath)).Directory.Create();
+        var luaFile = new System.IO.StreamWriter(outFilePath, false);
+        luaList.Add("include(\""+ outFilePath + "\");\n");
         using (luaFile)
         {
           luaFile.WriteLine();
@@ -154,7 +176,10 @@ namespace convert_tool
 
       if(mobList.Count > 0)
       {
-        var luaFile = new System.IO.StreamWriter("scripts\\mobs\\" + fileName + ".lua", false);
+        var outFilePath = "scripts\\mobs\\" + catagoryName + "\\" + fileName + ".lua";
+        (new FileInfo(outFilePath)).Directory.Create();
+        var luaFile = new System.IO.StreamWriter(outFilePath, false);
+        luaList.Add("include(\""+ outFilePath + "\");\n");
         using (luaFile)
         {
           luaFile.WriteLine();
