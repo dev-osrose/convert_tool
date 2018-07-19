@@ -76,7 +76,24 @@ namespace convert_tool
 
       var mobList = new List<string>();
       var npcList = new List<string>();
+      var spawnList = new List<string>();
       var warpList = new List<string>();
+
+      foreach (var spawnPoint in zoneFile.SpawnPoints)
+      {
+        if (spawnPoint.Name.Contains("WARP")) continue;
+
+        var destCoords = new Vector3(((spawnPoint.Position.X + 520000.00f) / 100.0f), ((spawnPoint.Position.Z + 520000.00f) / 100.0f), ((spawnPoint.Position.Y) / 100.0f));
+
+        if (spawnPoint.Name.Contains("start"))
+        {
+          spawnList.Add("login_point(" + mapId + ", " + destCoords.X + ", " + destCoords.Y + ");\n");
+        }
+        else
+        {
+          spawnList.Add("respawn_point(" + mapId + ", " + destCoords.X + ", " + destCoords.Y + ");\n");
+        }
+      }
 
       foreach (var ifo in mapDataFile)
       {
@@ -88,6 +105,22 @@ namespace convert_tool
         ExtractNpcs(npcList, mapId, ifo);
         ExtractMobs(mobList, mapId, ifo);
         ExtractWarpGates(warpList, mapId, ifo);
+      }
+
+      if (spawnList.Count > 0)
+      {
+        var luaFile = new System.IO.StreamWriter("scripts\\spawns\\" + fileName + ".lua", false);
+        using (luaFile)
+        {
+          luaFile.Write("--[[ SPAWN LIST\n");
+          luaFile.Write(
+            "login_point(<warp_alias>, <dest_map_id>, <dest_x_pos>, <dest_y_pos>, <dest_z_pos>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n");
+          luaFile.Write(
+            "respawn_point(<warp_alias>, <dest_map_id>, <dest_x_pos>, <dest_y_pos>, <dest_z_pos>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n");
+          luaFile.Write("--]]\n");
+          foreach (var mapObj in spawnList)
+            luaFile.Write(mapObj);
+        }
       }
 
       if (warpList.Count > 0)
