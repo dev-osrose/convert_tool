@@ -73,6 +73,9 @@ namespace convert_tool
       int typeIdx = 0;
       var sqlFile = new System.IO.StreamWriter("srv_data\\item_db.sql", false);
       sqlFile.Close();
+      
+      sqlFile = new System.IO.StreamWriter("srv_data\\mob_db.sql", false);
+      sqlFile.Close();
       foreach (var itemDataFile in itemDataFiles)
       {
         var itemData = new ItemData();
