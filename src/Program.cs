@@ -20,6 +20,7 @@
 #endregion
 
 using System;
+using System.IO;
 using Revise.Files.STB;
 
 namespace convert_tool
@@ -65,8 +66,12 @@ namespace convert_tool
       itemDataFiles[12].set("list_questitem.stb", "list_questitem_s.stl");
       itemDataFiles[13].set("list_pat.stb", "list_pat_s.stl");
 
+      (new FileInfo("srv_data\\scripts\\root.lua")).Directory.Create();
+      var luaFile = new System.IO.StreamWriter("srv_data\\scripts\\root.lua", false);
+      luaFile.Close();
+
       int typeIdx = 0;
-      var sqlFile = new System.IO.StreamWriter("item_db.sql", false);
+      var sqlFile = new System.IO.StreamWriter("srv_data\\item_db.sql", false);
       sqlFile.Close();
       foreach (var itemDataFile in itemDataFiles)
       {
@@ -95,6 +100,7 @@ namespace convert_tool
         zone.Load(dataFile[i][2], i);
       }
 
+      Console.Write("Done extracting. Press any key to exit...\n");
       Console.ReadLine();
     }
   }

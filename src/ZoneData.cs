@@ -56,7 +56,7 @@ namespace convert_tool
       Console.Write("Successful!\n");
 
       // Do the data conversion here
-      var mapDataFile = new MapDataFile[65,65];
+      var mapDataFile = new MapDataFile[65, 65];
       for (var x = 0; x < zoneFile.Width; x++)
       {
         for (var y = 0; y < zoneFile.Height; y++)
@@ -80,6 +80,27 @@ namespace convert_tool
       var spawnList = new List<string>();
       var warpList = new List<string>();
 
+      ExtractSpawnPoints(mapId, zoneFile, spawnList);
+
+      foreach (var ifo in mapDataFile)
+      {
+        if (ifo == null) continue;
+
+        var blockX = ifo.ZonePosition.X * PostionModifier;
+        var blockY = ifo.ZonePosition.Y * PostionModifier;
+
+        ExtractNpcs(npcList, mapId, ifo);
+        ExtractMobs(mobList, mapId, ifo);
+        ExtractWarpGates(warpList, mapId, ifo);
+      }
+
+      WriteLua(fileName, mobList, npcList, spawnList, warpList);
+
+      Console.Write("\n\n");
+    }
+
+    private static void ExtractSpawnPoints(int mapId, ZoneFile zoneFile, List<string> spawnList)
+    {
       foreach (var spawnPoint in zoneFile.SpawnPoints)
       {
         if (spawnPoint.Name.Contains("WARP")) continue;
@@ -95,105 +116,6 @@ namespace convert_tool
           spawnList.Add("respawn_point(" + mapId + ", " + destCoords.X + ", " + destCoords.Y + ");\n");
         }
       }
-
-      foreach (var ifo in mapDataFile)
-      {
-        if (ifo == null) continue;
-
-        var blockX = ifo.ZonePosition.X * PostionModifier;
-        var blockY = ifo.ZonePosition.Y * PostionModifier;
-
-        ExtractNpcs(npcList, mapId, ifo);
-        ExtractMobs(mobList, mapId, ifo);
-        ExtractWarpGates(warpList, mapId, ifo);
-      }
-
-      var catagoryName = "field";
-      Regex townRgx = new Regex(@"^[a-zA-Z][a-zA-Z]T\d{2}$"); // matches '<2 chars>T<2 numbers>'
-      if(fileName.Contains("PVP")) 
-      {
-        catagoryName = "pvp";
-      }
-      else if(townRgx.IsMatch(fileName))
-      {
-        catagoryName = "cities";
-      }
-
-      var luaList = new List<string>();
-      if (spawnList.Count > 0)
-      {
-        var outFilePath = "scripts\\spawns\\" + catagoryName + "\\" + fileName + ".lua";
-        (new FileInfo(outFilePath)).Directory.Create();
-        var luaFile = new System.IO.StreamWriter(outFilePath, false);
-        luaList.Add("include(\""+ outFilePath + "\");\n");
-        using (luaFile)
-        {
-          luaFile.Write("--[[ SPAWN LIST\n");
-          luaFile.Write(
-            "login_point(<warp_alias>, <dest_map_id>, <dest_x_pos>, <dest_y_pos>, <dest_z_pos>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n");
-          luaFile.Write(
-            "respawn_point(<warp_alias>, <dest_map_id>, <dest_x_pos>, <dest_y_pos>, <dest_z_pos>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n");
-          luaFile.Write("--]]\n");
-          foreach (var mapObj in spawnList)
-            luaFile.Write(mapObj);
-        }
-      }
-
-      if (warpList.Count > 0)
-      {
-        var outFilePath = "scripts\\warps\\" + catagoryName + "\\" + fileName + ".lua";
-        (new FileInfo(outFilePath)).Directory.Create();
-        var luaFile = new System.IO.StreamWriter(outFilePath, false);
-        luaList.Add("include(\""+ outFilePath + "\");\n");
-        using (luaFile)
-        {
-          luaFile.Write("--[[ WARP LIST\n");
-          luaFile.Write(
-            "warp_gate(<warp_alias>, <dest_map_id>, <dest_x_pos>, <dest_y_pos>, <dest_z_pos>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n");
-          luaFile.Write("--]]\n");
-          foreach (var mapObj in warpList)
-            luaFile.Write(mapObj);
-        }
-      }
-
-      if(npcList.Count > 0)
-      {
-        var outFilePath = "scripts\\npcs\\" + catagoryName + "\\" + fileName + ".lua";
-        (new FileInfo(outFilePath)).Directory.Create();
-        var luaFile = new System.IO.StreamWriter(outFilePath, false);
-        luaList.Add("include(\""+ outFilePath + "\");\n");
-        using (luaFile)
-        {
-          luaFile.WriteLine();
-          luaFile.WriteLine();
-          luaFile.Write("--[[ NPC SPAWN LIST\n");
-          luaFile.Write("npc(<npc_lua_file>, <npc_id>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>);\n");
-          luaFile.Write("--]]\n");
-          foreach (var mapObj in npcList)
-            luaFile.Write(mapObj);
-        }
-      }
-
-      if(mobList.Count > 0)
-      {
-        var outFilePath = "scripts\\mobs\\" + catagoryName + "\\" + fileName + ".lua";
-        (new FileInfo(outFilePath)).Directory.Create();
-        var luaFile = new System.IO.StreamWriter(outFilePath, false);
-        luaList.Add("include(\""+ outFilePath + "\");\n");
-        using (luaFile)
-        {
-          luaFile.WriteLine();
-          luaFile.WriteLine();
-          luaFile.Write("--[[ MOB SPAWN LIST\n");
-          luaFile.Write(
-            "mob(<mob_spawner_alias>, <mob_id>, <mob_count>, <spawner_limit>, <spawn_interval>, <spawner_range>, <map_id>, <x_pos>, <y_pos>, <z_pos>,);\n");
-          luaFile.Write("--]]\n");
-          foreach (var mapObj in mobList)
-            luaFile.Write(mapObj);
-        }
-      }
-
-      Console.Write("\n\n");
     }
 
     private static void ExtractMobs(List<string> mobList, int mapId, MapDataFile ifo)
@@ -304,6 +226,106 @@ namespace convert_tool
                       + warpGate.Scale.X + ", "
                       + warpGate.Scale.Y + ", "
                       + warpGate.Scale.Z + ");\n");
+      }
+    }
+
+    private static void WriteLua(string fileName, List<string> mobList, List<string> npcList, List<string> spawnList, List<string> warpList)
+    {
+      var catagoryName = "field";
+      Regex townRgx = new Regex(@"^[a-zA-Z][a-zA-Z]T\d{2}$"); // matches '<2 chars>T<2 numbers>'
+      if (fileName.Contains("PVP"))
+      {
+        catagoryName = "pvp";
+      }
+      else if (townRgx.IsMatch(fileName))
+      {
+        catagoryName = "cities";
+      }
+
+      var luaList = new List<string>();
+      if (spawnList.Count > 0)
+      {
+        var outFilePath = "srv_data\\scripts\\spawns\\" + catagoryName + "\\" + fileName + ".lua";
+        (new FileInfo(outFilePath)).Directory.Create();
+        var luaFile = new System.IO.StreamWriter(outFilePath, false);
+        luaList.Add("include(\"" + outFilePath + "\");\n");
+        using (luaFile)
+        {
+          luaFile.Write("--[[ SPAWN LIST\n");
+          luaFile.Write(
+            "login_point(<warp_alias>, <dest_map_id>, <dest_x_pos>, <dest_y_pos>, <dest_z_pos>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n");
+          luaFile.Write(
+            "respawn_point(<warp_alias>, <dest_map_id>, <dest_x_pos>, <dest_y_pos>, <dest_z_pos>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n");
+          luaFile.Write("--]]\n");
+          foreach (var mapObj in spawnList)
+            luaFile.Write(mapObj);
+        }
+      }
+
+      if (warpList.Count > 0)
+      {
+        var outFilePath = "srv_data\\scripts\\warps\\" + catagoryName + "\\" + fileName + ".lua";
+        (new FileInfo(outFilePath)).Directory.Create();
+        var luaFile = new System.IO.StreamWriter(outFilePath, false);
+        luaList.Add("include(\"" + outFilePath + "\");\n");
+        using (luaFile)
+        {
+          luaFile.Write("--[[ WARP LIST\n");
+          luaFile.Write(
+            "warp_gate(<warp_alias>, <dest_map_id>, <dest_x_pos>, <dest_y_pos>, <dest_z_pos>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n");
+          luaFile.Write("--]]\n");
+          foreach (var mapObj in warpList)
+            luaFile.Write(mapObj);
+        }
+      }
+
+      if (npcList.Count > 0)
+      {
+        var outFilePath = "srv_data\\scripts\\npcs\\" + catagoryName + "\\" + fileName + ".lua";
+        (new FileInfo(outFilePath)).Directory.Create();
+        var luaFile = new System.IO.StreamWriter(outFilePath, false);
+        luaList.Add("include(\"" + outFilePath + "\");\n");
+        using (luaFile)
+        {
+          luaFile.WriteLine();
+          luaFile.WriteLine();
+          luaFile.Write("--[[ NPC SPAWN LIST\n");
+          luaFile.Write("npc(<npc_lua_file>, <npc_id>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>);\n");
+          luaFile.Write("--]]\n");
+          foreach (var mapObj in npcList)
+            luaFile.Write(mapObj);
+        }
+      }
+
+      if (mobList.Count > 0)
+      {
+        var outFilePath = "srv_data\\scripts\\mobs\\" + catagoryName + "\\" + fileName + ".lua";
+        (new FileInfo(outFilePath)).Directory.Create();
+        var luaFile = new System.IO.StreamWriter(outFilePath, false);
+        luaList.Add("include(\"" + outFilePath + "\");\n");
+        using (luaFile)
+        {
+          luaFile.WriteLine();
+          luaFile.WriteLine();
+          luaFile.Write("--[[ MOB SPAWN LIST\n");
+          luaFile.Write(
+            "mob(<mob_spawner_alias>, <mob_id>, <mob_count>, <spawner_limit>, <spawn_interval>, <spawner_range>, <map_id>, <x_pos>, <y_pos>, <z_pos>,);\n");
+          luaFile.Write("--]]\n");
+          foreach (var mapObj in mobList)
+            luaFile.Write(mapObj);
+        }
+      }
+
+      if (luaList.Count > 0)
+      {
+        var outFilePath = "srv_data\\scripts\\root.lua";
+        (new FileInfo(outFilePath)).Directory.Create();
+        var luaFile = new System.IO.StreamWriter(outFilePath, true);
+        using (luaFile)
+        {
+          foreach (var luaObj in luaList)
+            luaFile.Write(luaObj);
+        }
       }
     }
   }

@@ -246,7 +246,7 @@ end";
         sqlFileList.Add(sqlEntry);
       }
 
-      var sqlFile = new System.IO.StreamWriter("item_db.sql", true);
+      var sqlFile = new System.IO.StreamWriter("srv_data\\item_db.sql", true);
       using (sqlFile)
       {
         foreach (var itemLine in sqlFileList)
