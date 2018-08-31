@@ -231,7 +231,7 @@ namespace convert_tool
 
     private static void WriteLua(string fileName, List<string> mobList, List<string> npcList, List<string> spawnList, List<string> warpList)
     {
-      var catagoryName = "field";
+      var catagoryName = "fields";
       Regex townRgx = new Regex(@"^[a-zA-Z][a-zA-Z]T\d{2}$"); // matches '<2 chars>T<2 numbers>'
       if (fileName.Contains("PVP"))
       {
@@ -324,7 +324,11 @@ namespace convert_tool
         using (luaFile)
         {
           foreach (var luaObj in luaList)
-            luaFile.Write(luaObj);
+          {
+            var luaObjFixed = luaObj.Replace("srv_data\\scripts\\", "");
+            luaObjFixed = luaObjFixed.Replace("\\", "/");
+            luaFile.Write(luaObjFixed);
+          }
         }
       }
     }

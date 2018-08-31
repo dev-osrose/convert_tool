@@ -31,12 +31,12 @@ namespace convert_tool
 {
   public class MobData
   {
-    public void Load(ItemType type = 0, string stbPath = null, string stlPath = null)
+    public void Load(string stbPath = null, string stlPath = null)
     {
-      if (type == 0 || stbPath == null || stlPath == null)
+      if (stbPath == null || stlPath == null)
         return;
 
-      var stringFile = new StringTableFile();      
+      var stringFile = new StringTableFile();
       var dataFile = new DataFile();
 
       Console.Write("Attempting to load \"" + stbPath + "\" and \"" + stlPath + "\" - ");
@@ -52,57 +52,158 @@ namespace convert_tool
         Console.WriteLine(e);
         return;
       }
+
       Console.Write("Successful!\n");
       List<string> sqlFileList = new List<string>();
+      List<string> luaFileList = new List<string>();
       for (var i = 0; i < dataFile.RowCount; i++)
       {
         StringTableRow strTableRow;
         var curRow = dataFile[i];
         try
         {
-          strTableRow = stringFile[curRow[(dataFile.ColumnCount - 1)]];
+          strTableRow = stringFile[curRow[40]];
         }
         catch (ArgumentException)
         {
           continue;
         }
 
-        var itemName = strTableRow.GetText();
-        var itemDesc = strTableRow.GetDescription();
+        var npcName = strTableRow.GetText();
+        var npcDesc = curRow[41];
 
-        if(itemName.Length == 0 || itemDesc.Length == 0) continue;
+        if (npcName.Length == 0 || npcDesc.Length == 0) continue;
 
-        string script = "";
-        List<string> reqTable = new List<string>();
-        List<string> bonusTable = new List<string>();
-        double priceSell = 0.0f;
-        int subtype, priceBuy, weight, attack, defense, range, slots, equipJobs, groundViewModel, durability, attackSpeed, magic, moveSpeed, usageRestrictions;
-        subtype = priceBuy = weight = attack = defense = range = slots = equipJobs = groundViewModel = durability = attackSpeed = magic = moveSpeed = usageRestrictions = 0;
-        
-        int.TryParse(curRow[4], out usageRestrictions);
-        int.TryParse(curRow[5], out subtype);
-        int.TryParse(curRow[6], out priceBuy);
-        double.TryParse(curRow[7], out priceSell);
-        int.TryParse(curRow[8], out weight);
+        int npcHeight,
+          npcWalkSpeed,
+          npcRunSpeed,
+          npcScale,
+          npcRWeapon,
+          npcLWeaponm,
+          npcLevel,
+          npcHp,
+          npcAttack,
+          npcHit,
+          npcDef,
+          npcRes,
+          npcAvoid,
+          npcAttackSpd,
+          npcIsMagicDamage,
+          npcAiType,
+          npcGiveExp,
+          npcDropType,
+          npcMarkNumber,
+          npcDropMoney,
+          npcDropItem,
+          npcUnionNumber,
+          npcNeedSummonCount,
+          npcSellTab0,
+          npcSellTab1,
+          npcSellTab2,
+          npcSellTab3,
+          npcCanTarget,
+          npcAttackRange,
+          npcType,
+          npcHitMaterialType,
+          npcFaceIcon,
+          npcSummonMobType,
+          npcNormalEffectSound,
+          npcAttackSound,
+          npcHitSound,
+          npcHandHitEffect,
+          npcDeadEffect,
+          npcDieSound,
+          npcQuestType,
+          npcGlowColor,
+          npcCreateEffect,
+          npcCreateSound;
 
-        int.TryParse(curRow[11], out groundViewModel);
-        int.TryParse(curRow[17], out equipJobs);
+        npcHeight = npcWalkSpeed = npcRunSpeed = npcScale = npcRWeapon = npcLWeaponm = npcLevel = npcHp = npcAttack =
+          npcHit = npcDef = npcRes = npcAvoid = npcAttackSpd = npcIsMagicDamage =
+            npcAiType = npcGiveExp = npcDropType = npcMarkNumber = npcDropMoney = npcDropItem = npcUnionNumber =
+              npcNeedSummonCount =
+                npcSellTab0 = npcSellTab1 = npcSellTab2 = npcSellTab3 = npcCanTarget = npcAttackRange = npcType =
+                  npcHitMaterialType = npcFaceIcon = npcSummonMobType = npcNormalEffectSound = npcAttackSound =
+                    npcHitSound = npcHandHitEffect = npcDeadEffect =
+                      npcDieSound = npcQuestType = npcGlowColor = npcCreateEffect = npcCreateSound = 0;
+
+
+        int.TryParse(curRow[02], out npcWalkSpeed); //lua?
+        int.TryParse(curRow[03], out npcRunSpeed); //lua?
+        int.TryParse(curRow[04], out npcScale); //lua
+        int.TryParse(curRow[05], out npcRWeapon); //lua?
+        int.TryParse(curRow[06], out npcLWeaponm); //lua?
+        int.TryParse(curRow[07], out npcLevel); //lua?
+        int.TryParse(curRow[08], out npcHp); //sql? lua?
+        int.TryParse(curRow[09], out npcAttack); //lua?
+        int.TryParse(curRow[10], out npcHit); //lua?
+        int.TryParse(curRow[11], out npcDef); //lua?
+        int.TryParse(curRow[12], out npcRes); //lua?
+        int.TryParse(curRow[13], out npcAvoid); //lua?
+        int.TryParse(curRow[14], out npcAttackSpd); //lua?
+        int.TryParse(curRow[15], out npcIsMagicDamage); //lua?
+        int.TryParse(curRow[16], out npcAiType); //lua
+        int.TryParse(curRow[17], out npcGiveExp); //lua
+        int.TryParse(curRow[18], out npcDropType); //lua
+        int.TryParse(curRow[18], out npcMarkNumber); // NPC icon (only used with EVO style npc boxes)
+        int.TryParse(curRow[19], out npcDropMoney); //lua
+
+        int.TryParse(curRow[20], out npcDropItem); //lua
+        int.TryParse(curRow[20], out npcUnionNumber); //sql
+        int.TryParse(curRow[21], out npcNeedSummonCount); //lua, used for unknown...
+        int.TryParse(curRow[21], out npcSellTab0); //lua
+        int.TryParse(curRow[22], out npcSellTab1); //lua
+        int.TryParse(curRow[23], out npcSellTab2); //lua 
+        int.TryParse(curRow[24], out npcSellTab3); //lua
+        int.TryParse(curRow[25], out npcCanTarget);
+        int.TryParse(curRow[26], out npcAttackRange); //lua?
+        int.TryParse(curRow[27], out npcType); //sql?
+        int.TryParse(curRow[28], out npcHitMaterialType);
+        int.TryParse(curRow[29], out npcFaceIcon); // NPC face icon (only used with EVO style npc boxes)
+        int.TryParse(curRow[29], out npcSummonMobType);
+
+        int.TryParse(curRow[30], out npcNormalEffectSound);
+        int.TryParse(curRow[31], out npcAttackSound);
+        int.TryParse(curRow[32], out npcHitSound);
+        int.TryParse(curRow[33], out npcHandHitEffect);
+        int.TryParse(curRow[34], out npcDeadEffect);
+        int.TryParse(curRow[35], out npcDieSound);
+        int.TryParse(curRow[38], out npcQuestType); //lua
+        int.TryParse(curRow[39], out npcGlowColor);
+
+        int.TryParse(curRow[42], out npcHeight);
+        int.TryParse(curRow[44], out npcCreateEffect);
+        int.TryParse(curRow[45], out npcCreateSound);
+
 
         string sqlEntry =
-          "REPLACE into mob_db(id, name, `desc`, type, subtype, price_buy, price_sell, weight, attack, defense, `range`, slots, equip_jobs, view_id, script) ";
-        sqlEntry += "values(" + i + ", \"" + itemName + "\", \"" + itemDesc + "\", " + (int)(type) + ", " + subtype + ", " + priceBuy + ", " + priceSell + ", " + weight + ", " + attack + ", " + defense + ", " + range + ", " + slots + ", " + equipJobs + ", " + groundViewModel + ", \"" + script + "\");";
+          "REPLACE into mob_db(id, name, `desc`, subtype, price_buy, price_sell, weight, attack, defense, `range`, slots, equip_jobs, view_id, script) ";
+/*
+         sqlEntry += "values(" + i + ", \"" + npcName + "\", \"" + npcDesc + ", " + subtype + ", " + priceBuy + ", " +
+                    priceSell + ", " + weight + ", " + attack + ", " + defense + ", " + range + ", " + slots + ", " +
+                    equipJobs + ", " + groundViewModel + ", \"" + script + "\");";
+*/
 
         sqlFileList.Add(sqlEntry);
       }
 
-      var sqlFile = new System.IO.StreamWriter("srv_data\\mob_db.sql", true);
+      /*var sqlFile = new System.IO.StreamWriter("srv_data\\mob_db.sql", true);
       using (sqlFile)
       {
-        foreach (var itemLine in sqlFileList)
+        foreach (var mobLine in sqlFileList)
         {
-          sqlFile.WriteLine(itemLine);
+          sqlFile.WriteLine(mobLine);
         }
-      }
+      }*/
+
+      /*var luaFile = new System.IO.StreamWriter("srv_data\\scripts\\npc\\test.lua", true);
+      using (luaFile)
+      {
+        foreach (var mobLine in luaFileList)
+        {
+          luaFile.WriteLine(mobLine);
+        }
+      }*/
     }
   }
 }
