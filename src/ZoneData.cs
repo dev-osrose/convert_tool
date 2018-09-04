@@ -101,6 +101,22 @@ namespace convert_tool
 
     private static void ExtractSpawnPoints(int mapId, ZoneFile zoneFile, List<string> spawnList)
     {
+      const string zoneStb = "./3DDATA/stb/list_zone.stb";
+
+      var zoneDataFile = new DataFile();
+      zoneDataFile.Load(zoneStb);
+
+      var curMapRow = zoneDataFile[mapId];
+
+      var reviveMap = curMapRow[32];
+      double.TryParse(curMapRow[33], out var reviveX);
+      double.TryParse(curMapRow[34], out var reviveY);
+
+      if (reviveMap.Length > 0)
+      {
+        spawnList.Add("revive_point(" + reviveMap + ", " + (reviveX * 1000.0f) + ", " + (reviveY * 10000.0f) + ");\n");
+      }
+
       foreach (var spawnPoint in zoneFile.SpawnPoints)
       {
         if (spawnPoint.Name.Contains("WARP")) continue;
@@ -109,7 +125,7 @@ namespace convert_tool
 
         if (spawnPoint.Name.Contains("start"))
         {
-          spawnList.Add("login_point(" + mapId + ", " + destCoords.X + ", " + destCoords.Y + ");\n");
+          spawnList.Add("start_point(" + mapId + ", " + destCoords.X + ", " + destCoords.Y + ");\n");
         }
         else
         {
