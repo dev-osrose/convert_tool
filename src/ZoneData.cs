@@ -267,7 +267,7 @@ namespace convert_tool
         luaList.Add("include(\"" + outFilePath + "\");\n");
         using (luaFile)
         {
-          luaFile.Write("--[[ SPAWN LIST\n");
+          luaFile.Write("--[[ PLAYER SPAWN POINT LIST\n");
           luaFile.Write(
             "login_point(<warp_alias>, <dest_map_id>, <dest_x_pos>, <dest_y_pos>, <dest_z_pos>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n");
           luaFile.Write(
@@ -286,7 +286,7 @@ namespace convert_tool
         luaList.Add("include(\"" + outFilePath + "\");\n");
         using (luaFile)
         {
-          luaFile.Write("--[[ WARP LIST\n");
+          luaFile.Write("--[[ WARP GATE LIST\n");
           luaFile.Write(
             "warp_gate(<warp_alias>, <dest_map_id>, <dest_x_pos>, <dest_y_pos>, <dest_z_pos>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n");
           luaFile.Write("--]]\n");
@@ -334,7 +334,7 @@ namespace convert_tool
 
       if (luaList.Count > 0)
       {
-        var outFilePath = "srv_data\\scripts\\root.lua";
+        var outFilePath = "srv_data\\scripts\\npc_spawns.lua";
         (new FileInfo(outFilePath)).Directory.Create();
         var luaFile = new System.IO.StreamWriter(outFilePath, true);
         using (luaFile)

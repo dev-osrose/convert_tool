@@ -23,6 +23,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Revise.Files.STB;
 using Revise.Files.STL;
 using SharpDX;
@@ -54,15 +55,16 @@ namespace convert_tool
       }
 
       Console.Write("Successful!\n");
-      List<string> sqlFileList = new List<string>();
-      List<string> luaFileList = new List<string>();
+
+      var luaList = new List<string>();
+      Dictionary<string,string> luaCode = new Dictionary<string, string>();
       for (var i = 0; i < dataFile.RowCount; i++)
       {
         StringTableRow strTableRow;
         var curRow = dataFile[i];
         try
         {
-          strTableRow = stringFile[curRow[40]];
+          strTableRow = stringFile[curRow[41]];
         }
         catch (ArgumentException)
         {
@@ -72,14 +74,14 @@ namespace convert_tool
         var npcName = strTableRow.GetText();
         var npcDesc = curRow[41];
 
-        if (npcName.Length == 0 || npcDesc.Length == 0) continue;
+        if (npcName.Length == 0) continue;
 
         int npcHeight,
           npcWalkSpeed,
           npcRunSpeed,
           npcScale,
           npcRWeapon,
-          npcLWeaponm,
+          npcLWeapon,
           npcLevel,
           npcHp,
           npcAttack,
@@ -118,7 +120,7 @@ namespace convert_tool
           npcCreateEffect,
           npcCreateSound;
 
-        npcHeight = npcWalkSpeed = npcRunSpeed = npcScale = npcRWeapon = npcLWeaponm = npcLevel = npcHp = npcAttack =
+        npcHeight = npcWalkSpeed = npcRunSpeed = npcScale = npcRWeapon = npcLWeapon = npcLevel = npcHp = npcAttack =
           npcHit = npcDef = npcRes = npcAvoid = npcAttackSpd = npcIsMagicDamage =
             npcAiType = npcGiveExp = npcDropType = npcMarkNumber = npcDropMoney = npcDropItem = npcUnionNumber =
               npcNeedSummonCount =
@@ -132,7 +134,7 @@ namespace convert_tool
         int.TryParse(curRow[03], out npcRunSpeed); //lua?
         int.TryParse(curRow[04], out npcScale); //lua
         int.TryParse(curRow[05], out npcRWeapon); //lua?
-        int.TryParse(curRow[06], out npcLWeaponm); //lua?
+        int.TryParse(curRow[06], out npcLWeapon); //lua?
         int.TryParse(curRow[07], out npcLevel); //lua?
         int.TryParse(curRow[08], out npcHp); //sql? lua?
         int.TryParse(curRow[09], out npcAttack); //lua?
@@ -172,38 +174,110 @@ namespace convert_tool
         int.TryParse(curRow[39], out npcGlowColor);
 
         int.TryParse(curRow[42], out npcHeight);
-        int.TryParse(curRow[44], out npcCreateEffect);
-        int.TryParse(curRow[45], out npcCreateSound);
+        int.TryParse(curRow[43], out npcCreateEffect);
+        int.TryParse(curRow[44], out npcCreateSound);
+
+        string script = "";
+
+        script += "npc[" + i + "].walk_speed = " + npcWalkSpeed + "\n";
+        script += "npc[" + i + "].run_speed = " + npcRunSpeed + "\n";
+        script += "npc[" + i + "].scale = " + npcScale + "\n";
+        script += "npc[" + i + "].r_weapon = " + npcRWeapon + "\n";
+        script += "npc[" + i + "].l_weapon = " + npcLWeapon + "\n";
+        script += "npc[" + i + "].level = " + npcLevel + "\n";
+        script += "npc[" + i + "].hp = " + npcHp + "\n";
+        script += "npc[" + i + "].attack = " + npcAttack + "\n";
+        script += "npc[" + i + "].hit = " + npcHit + "\n";
+        script += "npc[" + i + "].def = " + npcDef + "\n";
+        script += "npc[" + i + "].res = " + npcRes + "\n";
+        script += "npc[" + i + "].avoid = " + npcAvoid + "\n";
+        script += "npc[" + i + "].attack_spd = " + npcAttackSpd + "\n";
+        script += "npc[" + i + "].is_magic_damage = " + npcIsMagicDamage + "\n";
+        script += "npc[" + i + "].ai_type = " + npcAiType + "\n";
+        script += "npc[" + i + "].give_exp = " + npcGiveExp + "\n";
+        script += "npc[" + i + "].drop_type = " + npcDropType + "\n";
+        script += "npc[" + i + "].drop_money = " + npcDropMoney + "\n";
+        script += "npc[" + i + "].drop_item = " + npcDropItem + "\n";
+        script += "npc[" + i + "].union_number = " + npcUnionNumber + "\n";
+        script += "npc[" + i + "].need_summon_count = " + npcNeedSummonCount + "\n";
+        script += "npc[" + i + "].sell_tab0 = " + npcSellTab0 + "\n";
+        script += "npc[" + i + "].sell_tab1 = " + npcSellTab1 + "\n";
+        script += "npc[" + i + "].sell_tab2 = " + npcSellTab2 + "\n";
+        script += "npc[" + i + "].sell_tab3 = " + npcSellTab3 + "\n";
+        script += "npc[" + i + "].can_target = " + npcCanTarget + "\n";
+        script += "npc[" + i + "].attack_range = " + npcAttackRange + "\n";
+        script += "npc[" + i + "].npc_type = " + npcType + "\n";
+        script += "npc[" + i + "].hit_material_type = " + npcHitMaterialType + "\n";
+        script += "npc[" + i + "].face_icon = " + npcFaceIcon + "\n";
+        script += "npc[" + i + "].summon_mob_type = " + npcSummonMobType + "\n";
+        script += "npc[" + i + "].quest_type = " + npcQuestType + "\n";
+        script += "npc[" + i + "].height = " + npcHeight + "\n";
 
 
-        string sqlEntry =
-          "REPLACE into mob_db(id, name, `desc`, subtype, price_buy, price_sell, weight, attack, defense, `range`, slots, equip_jobs, view_id, script) ";
-/*
-         sqlEntry += "values(" + i + ", \"" + npcName + "\", \"" + npcDesc + ", " + subtype + ", " + priceBuy + ", " +
-                    priceSell + ", " + weight + ", " + attack + ", " + defense + ", " + range + ", " + slots + ", " +
-                    equipJobs + ", " + groundViewModel + ", \"" + script + "\");";
-*/
+        var luaObjFixed = npcName.ToLower().Replace(" ", "_");
+        if (!luaCode.ContainsKey(luaObjFixed))
+        {
+          luaCode.Add(luaObjFixed, script);
+        }
+        else
+        {
+          string oldScript = luaCode[luaObjFixed];
+          luaCode.Remove(luaObjFixed);
 
-        sqlFileList.Add(sqlEntry);
+          luaCode.Add(luaObjFixed, oldScript + "\n" + script);
+        }
       }
 
-      /*var sqlFile = new System.IO.StreamWriter("srv_data\\mob_db.sql", true);
-      using (sqlFile)
+      foreach (var luaOut in luaCode)
       {
-        foreach (var mobLine in sqlFileList)
+        var catagoryName = "mobs";
+        if (luaOut.Key.Contains("["))
         {
-          sqlFile.WriteLine(mobLine);
+          catagoryName = "npcs";
         }
-      }*/
+        var outFilePath = "srv_data\\scripts\\" + catagoryName + "\\ai\\" + luaOut.Key + ".lua";
+        (new FileInfo(outFilePath)).Directory.Create();
+        var luaFile = new System.IO.StreamWriter(outFilePath, false);
+        luaList.Add("include(\"" + outFilePath + "\");\n");
+        using (luaFile)
+        {
+          var valueOut = luaOut.Value + @"
+function OnInit()
+  return true
+end
 
-      /*var luaFile = new System.IO.StreamWriter("srv_data\\scripts\\npc\\test.lua", true);
-      using (luaFile)
-      {
-        foreach (var mobLine in luaFileList)
-        {
-          luaFile.WriteLine(mobLine);
+function OnCreate()
+  return true
+end
+
+function OnDelete()
+  return true
+end
+
+function OnDead(entity)
+end
+
+function OnDamaged(entity)
+end"; ;
+          luaFile.Write(valueOut);
         }
-      }*/
+      }
+
+      if (luaList.Count > 0)
+      {
+        var outFilePath = "srv_data\\scripts\\npc_scripts.lua";
+        (new FileInfo(outFilePath)).Directory.Create();
+        var luaFile = new System.IO.StreamWriter(outFilePath, true);
+        using (luaFile)
+        {
+          foreach (var luaObj in luaList)
+          {
+            var luaObjFixed = luaObj.Replace("srv_data\\scripts\\", "");
+            luaObjFixed = luaObjFixed.Replace("\\", "/");
+            luaFile.Write(luaObjFixed);
+          }
+        }
+      }
     }
   }
 }

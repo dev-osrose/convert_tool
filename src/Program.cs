@@ -68,6 +68,16 @@ namespace convert_tool
 
       (new FileInfo("srv_data\\scripts\\root.lua")).Directory.Create();
       var luaFile = new System.IO.StreamWriter("srv_data\\scripts\\root.lua", false);
+      luaFile.Write("include(\"npc_scripts.lua\");\n");
+      luaFile.Write("include(\"npc_spawns.lua\");\n");
+      luaFile.Close();
+
+      (new FileInfo("srv_data\\scripts\\npc_spawns.lua")).Directory.Create();
+      luaFile = new System.IO.StreamWriter("srv_data\\scripts\\npc_spawns.lua", false);
+      luaFile.Close();
+
+      (new FileInfo("srv_data\\scripts\\npc_scripts.lua")).Directory.Create();
+      luaFile = new System.IO.StreamWriter("srv_data\\scripts\\npc_scripts.lua", false);
       luaFile.Close();
 
       int typeIdx = 0;
@@ -102,6 +112,12 @@ namespace convert_tool
         var zone = new ZoneData();
         zone.Load(dataFile[i][2], i);
       }
+
+
+      const string npcStb = "list_npc.stb";
+      const string npcStl = "list_npc_s.stl";
+      var mobFile = new MobData();
+      mobFile.Load(stbRoot + npcStb, stbRoot + npcStl);
 
       Console.Write("Done extracting. Press any key to exit...\n");
       Console.ReadLine();
