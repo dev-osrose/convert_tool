@@ -179,6 +179,7 @@ namespace convert_tool
 
         string script = "";
 
+        script += "npc[" + i + "] = {}\n";
         script += "npc[" + i + "].walk_speed = " + npcWalkSpeed + "\n";
         script += "npc[" + i + "].run_speed = " + npcRunSpeed + "\n";
         script += "npc[" + i + "].scale = " + npcScale + "\n";
@@ -242,15 +243,15 @@ namespace convert_tool
         using (luaFile)
         {
           var valueOut = luaOut.Value + @"
-function OnInit()
+function OnInit(entity)
   return true
 end
 
-function OnCreate()
+function OnCreate(entity)
   return true
 end
 
-function OnDelete()
+function OnDelete(entity)
   return true
 end
 
@@ -258,7 +259,7 @@ function OnDead(entity)
 end
 
 function OnDamaged(entity)
-end"; ;
+end";
           luaFile.Write(valueOut);
         }
       }
