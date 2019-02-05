@@ -29,7 +29,7 @@ using SharpDX;
 
 namespace convert_tool
 {
-  public class ItemData
+  public class SkillData
   {
     public enum ItemType : int {
       FACE = 1,
@@ -129,7 +129,7 @@ namespace convert_tool
             if (bonusType.Length == 0) continue;
 
             var bonusId = "bonusTable[" + (bonusIndex + 1) + "]";
-            bonusTable.Add(bonusId + " = {}\n" +
+            reqTable.Add(bonusId + " = {}\n" +
                          bonusId + ".type = " + bonusType + "\n" +
                          bonusId + ".value = " + value + "\n");
           }
@@ -180,23 +180,13 @@ namespace convert_tool
 
 
 
-        script += "use_restriction = " + usageRestrictions + "\n\n";
-
-        if (reqTable.Count > 0)
-        {
-          script += "reqTable = {}\n";
-        }
+        script += "use_restriction = " + usageRestrictions + "\n";
 
         foreach (var requirement in reqTable)
         {
           script += requirement;
         }
 
-
-        if (bonusTable.Count > 0)
-        {
-          script += "bonusTable = {}\n";
-        }
         foreach (var bonus in bonusTable)
         {
           script += bonus;
@@ -216,45 +206,23 @@ function OnDelete()
   return true
 end
 
-function OnEquip(entity)";
-        if (reqTable.Count > 0)
-        {
-          script +=
-          @"
+function OnEquip(entity)
   for i, data in ipairs(reqTable) do
     if data.value > getAttr(entity, data.type) then
       return false
     end
-  end";
-        }
+  end
 
-        if (bonusTable.Count > 0)
-        {
-          script +=
-          @"
   for i, data in ipairs(bonusTable) do
     addBonusAttr(entity, data.type, data.value)
-  end";
-        }
-
-        script +=
-          @"
+  end
   return true
 end
 
-function OnUnequip(entity)";
-
-        if (bonusTable.Count > 0)
-        {
-          script +=
-            @"
+function OnUnequip(entity)
   for i, data in ipairs(bonusTable) do
     removeBonusAttr(entity, data.type, data.value)
-  end";
-        }
-
-        script +=
-          @"
+  end
   return true
 end
 

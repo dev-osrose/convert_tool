@@ -26,6 +26,7 @@ using System.Text.RegularExpressions;
 using Revise.Files.CON;
 using Revise.Files.IFO;
 using Revise.Files.STB;
+using Revise.Files.ZMS;
 using Revise.Files.ZON;
 using SharpDX;
 
@@ -201,6 +202,7 @@ namespace convert_tool
     {
       const string warpStb = "./3DDATA/stb/warp.stb";
       const string zoneStb = "./3DDATA/stb/list_zone.stb";
+      const string warpGateModel = "./3DDATA/special/warp_gate01/warp.zms";
 
       var zoneDataFile = new DataFile();
       zoneDataFile.Load(zoneStb);
@@ -208,6 +210,10 @@ namespace convert_tool
       var warpDataFile = new DataFile();
       warpDataFile.Load(warpStb);
       var destCoords = Vector3.Zero;
+
+      ModelFile modelFile = new ModelFile();
+      modelFile.Load(warpGateModel);
+      var boundingBox = modelFile.BoundingBox;
 
       foreach (var warpGate in ifo.WarpPoints)
       {

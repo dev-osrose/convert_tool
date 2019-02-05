@@ -153,10 +153,13 @@ namespace convert_tool
         int.TryParse(curRow[20], out npcDropItem); //lua
         int.TryParse(curRow[20], out npcUnionNumber); //sql
         int.TryParse(curRow[21], out npcNeedSummonCount); //lua, used for unknown...
+        // This is indexes into LIST_SELL.STB
+        // We need to read LIST_SELL to convert these NPC tabs
         int.TryParse(curRow[21], out npcSellTab0); //lua
         int.TryParse(curRow[22], out npcSellTab1); //lua
         int.TryParse(curRow[23], out npcSellTab2); //lua 
         int.TryParse(curRow[24], out npcSellTab3); //lua
+
         int.TryParse(curRow[25], out npcCanTarget);
         int.TryParse(curRow[26], out npcAttackRange); //lua?
         int.TryParse(curRow[27], out npcType); //sql?
