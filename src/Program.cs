@@ -102,7 +102,7 @@ namespace convert_tool
       Console.Write(
         "mob(<mob_spawner_alias>, <map_id>, <mob_id>, <mob_count>, <spawner_limit>, <spawner_interval>, <spawner_range>, <x_pos>, <y_pos>, <angle>);\n");
       Console.Write(
-        "warp_gate(<warp_alias>, <gate_to>, <this_gate_id>, <map_id>, <x_pos>, <y_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n\n");
+        "warp_gate(<warp_alias>, <gate_to>, <this_gate_id>, <map_id>, <min_x_pos>, <min_y_pos>, <min_z_pos>, <max_x_pos>, <max_y_pos>, <max_z_pos>);\n\n");
 
       for (var i = 1; i < dataFile.RowCount; i++)
       {

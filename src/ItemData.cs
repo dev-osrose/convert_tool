@@ -113,7 +113,7 @@ namespace convert_tool
             var reqType = curRow[(20 + (reqIndex * 2))];
             var value = curRow[(21 + (reqIndex * 2))];
 
-            if (reqType.Length == 0) continue;
+            if (reqType.Length == 0 || value.Length == 0) continue;
 
             var reqId = "reqTable[" + (reqIndex + 1) + "]";
             reqTable.Add(reqId + " = {}\n" +
@@ -126,7 +126,7 @@ namespace convert_tool
             var bonusType = curRow[(25 + (bonusIndex * 3))];
             var value = curRow[(26 + (bonusIndex * 3))];
 
-            if (bonusType.Length == 0) continue;
+            if (bonusType.Length == 0 || value.Length == 0) continue;
 
             var bonusId = "bonusTable[" + (bonusIndex + 1) + "]";
             bonusTable.Add(bonusId + " = {}\n" +

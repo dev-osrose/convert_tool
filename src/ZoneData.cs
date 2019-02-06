@@ -213,7 +213,7 @@ namespace convert_tool
 
       ModelFile modelFile = new ModelFile();
       modelFile.Load(warpGateModel);
-      var boundingBox = modelFile.BoundingBox;
+      var vertices = modelFile.Vertices;
 
       foreach (var warpGate in ifo.WarpPoints)
       {
@@ -233,7 +233,20 @@ namespace convert_tool
           }
         }
 
-        var gateCoords = new Vector3(((warpGate.Position.X + 520000.00f) / 100.0f), ((warpGate.Position.Y + 520000.00f) / 100.0f), ((warpGate.Position.Z) / 100.0f));
+        var position = new Vector3(((warpGate.Position.X + 520000.00f) / 100.0f), ((warpGate.Position.Y + 520000.00f) / 100.0f), ((warpGate.Position.Z) / 100.0f));
+
+        var world = Matrix.Identity;
+        var rot = Matrix.RotationQuaternion(warpGate.Rotation);
+        var scale = Matrix.Scaling(warpGate.Scale);
+        var trans = Matrix.Translation(position);
+
+        var objectWorld = rot * scale * trans;
+
+        Vector3[] vectorPositions = new Vector3[vertices.Count];
+        for (int i = 0; i < vertices.Count; i++)
+          vectorPositions[i] = (Vector3)Vector3.Transform(vertices[i].Position, world * objectWorld);
+
+        var boundingBox = BoundingBox.FromPoints(vectorPositions);
 
         warpList.Add("warp_gate(\"\", " 
                       + warpDataFile[warpGate.WarpID][2].ToString() + ", "
@@ -241,13 +254,12 @@ namespace convert_tool
                       + (destCoords.Y) + ", "
                       + (destCoords.Z) + ", "
                       + mapId.ToString() + ", "
-                      + (gateCoords.X) + ", "
-                      + (gateCoords.Y) + ", "
-                      + (gateCoords.Z) + ", "
-                      + warpGate.Rotation.Angle + ", "
-                      + warpGate.Scale.X + ", "
-                      + warpGate.Scale.Y + ", "
-                      + warpGate.Scale.Z + ");\n");
+                      + (boundingBox.Minimum.X) + ", "
+                      + (boundingBox.Minimum.Y) + ", "
+                      + (boundingBox.Minimum.Z) + ", "
+                      + (boundingBox.Maximum.X) + ", "
+                      + (boundingBox.Maximum.Y) + ", "
+                      + (boundingBox.Maximum.Z) + ");\n");
       }
     }
 
@@ -275,9 +287,11 @@ namespace convert_tool
         {
           luaFile.Write("--[[ PLAYER SPAWN POINT LIST\n");
           luaFile.Write(
-            "login_point(<warp_alias>, <dest_map_id>, <dest_x_pos>, <dest_y_pos>, <dest_z_pos>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n");
+            "revive_point(<map_id>, <x_pos>, <y_pos>);\n");
           luaFile.Write(
-            "respawn_point(<warp_alias>, <dest_map_id>, <dest_x_pos>, <dest_y_pos>, <dest_z_pos>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n");
+            "start_point(<map_id>, <x_pos>, <y_pos>);\n");
+          luaFile.Write(
+            "respawn_point(<map_id>, <x_pos>, <y_pos>);\n");
           luaFile.Write("--]]\n");
           foreach (var mapObj in spawnList)
             luaFile.Write(mapObj);
@@ -294,7 +308,7 @@ namespace convert_tool
         {
           luaFile.Write("--[[ WARP GATE LIST\n");
           luaFile.Write(
-            "warp_gate(<warp_alias>, <dest_map_id>, <dest_x_pos>, <dest_y_pos>, <dest_z_pos>, <map_id>, <x_pos>, <y_pos>, <z_pos>, <angle>, <x_scale>, <y_scale>, <z_scale>);\n");
+            "warp_gate(<warp_alias>, <gate_to>, <this_gate_id>, <map_id>, <min_x_pos>, <min_y_pos>, <min_z_pos>, <max_x_pos>, <max_y_pos>, <max_z_pos>);\n");
           luaFile.Write("--]]\n");
           foreach (var mapObj in warpList)
             luaFile.Write(mapObj);
@@ -331,7 +345,7 @@ namespace convert_tool
           luaFile.WriteLine();
           luaFile.Write("--[[ MOB SPAWN LIST\n");
           luaFile.Write(
-            "mob(<mob_spawner_alias>, <mob_id>, <mob_count>, <spawner_limit>, <spawn_interval>, <spawner_range>, <map_id>, <x_pos>, <y_pos>, <z_pos>,);\n");
+            "mob(<mob_spawner_alias>, <mob_id>, <mob_count>, <spawner_limit>, <spawn_interval>, <spawner_range>, <map_id>, <x_pos>, <y_pos>, <z_pos>);\n");
           luaFile.Write("--]]\n");
           foreach (var mapObj in mobList)
             luaFile.Write(mapObj);
