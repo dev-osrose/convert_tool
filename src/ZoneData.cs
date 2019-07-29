@@ -28,6 +28,7 @@ using Revise.Files.IFO;
 using Revise.Files.STB;
 using Revise.Files.ZMS;
 using Revise.Files.ZON;
+using Revise.Files.ZSC;
 using SharpDX;
 
 namespace convert_tool
@@ -203,13 +204,17 @@ namespace convert_tool
       const string warpStb = "./3DDATA/stb/warp.stb";
       const string zoneStb = "./3DDATA/stb/list_zone.stb";
       const string warpGateModel = "./3DDATA/special/warp_gate01/warp.zms";
+      const string decoSpecialList = "./3DDATA/special/list_deco_special.zsc";
 
-      var zoneDataFile = new DataFile();
+            var zoneDataFile = new DataFile();
       zoneDataFile.Load(zoneStb);
 
       var warpDataFile = new DataFile();
       warpDataFile.Load(warpStb);
       var destCoords = Vector3.Zero;
+
+      ModelListFile modelListFile = new ModelListFile();
+      modelListFile.Load(decoSpecialList);
 
       ModelFile modelFile = new ModelFile();
       modelFile.Load(warpGateModel);
@@ -235,12 +240,16 @@ namespace convert_tool
 
         var position = new Vector3(((warpGate.Position.X + 520000.00f) / 100.0f), ((warpGate.Position.Y + 520000.00f) / 100.0f), ((warpGate.Position.Z) / 100.0f));
 
-        var world = Matrix.Identity;
-        var rot = Matrix.RotationQuaternion(warpGate.Rotation);
-        var scale = Matrix.Scaling(warpGate.Scale);
-        var trans = Matrix.Translation(position);
+        var rot = Matrix.RotationQuaternion(modelListFile.Objects[1].Parts[0].Rotation);
+        var scale = Matrix.Scaling(modelListFile.Objects[1].Parts[0].Scale);
+        var trans = Matrix.Translation(modelListFile.Objects[1].Parts[0].Position);
 
-        var objectWorld = rot * scale * trans;
+        var world = rot * scale * trans;
+        var objRot = Matrix.RotationQuaternion(warpGate.Rotation);
+        var objScale = Matrix.Scaling(warpGate.Scale);
+        var objTrans = Matrix.Translation(position);
+
+        var objectWorld = objRot * objScale * objTrans;
 
         Vector3[] vectorPositions = new Vector3[vertices.Count];
         for (int i = 0; i < vertices.Count; i++)
@@ -308,7 +317,7 @@ namespace convert_tool
         {
           luaFile.Write("--[[ WARP GATE LIST\n");
           luaFile.Write(
-            "warp_gate(<warp_alias>, <gate_to>, <this_gate_id>, <map_id>, <min_x_pos>, <min_y_pos>, <min_z_pos>, <max_x_pos>, <max_y_pos>, <max_z_pos>);\n");
+            "warp_gate(<warp_alias>, <dest_map>, <dest_x>, <dest_y>, <dest_z>, <map_id>, <min_x_pos>, <min_y_pos>, <min_z_pos>, <max_x_pos>, <max_y_pos>, <max_z_pos>);\n");
           luaFile.Write("--]]\n");
           foreach (var mapObj in warpList)
             luaFile.Write(mapObj);

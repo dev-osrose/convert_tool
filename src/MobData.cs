@@ -130,51 +130,51 @@ namespace convert_tool
                       npcDieSound = npcQuestType = npcGlowColor = npcCreateEffect = npcCreateSound = 0;
 
 
-        int.TryParse(curRow[02], out npcWalkSpeed); //lua?
-        int.TryParse(curRow[03], out npcRunSpeed); //lua?
-        int.TryParse(curRow[04], out npcScale); //lua
-        int.TryParse(curRow[05], out npcRWeapon); //lua?
-        int.TryParse(curRow[06], out npcLWeapon); //lua?
-        int.TryParse(curRow[07], out npcLevel); //lua?
-        int.TryParse(curRow[08], out npcHp); //sql? lua?
-        int.TryParse(curRow[09], out npcAttack); //lua?
-        int.TryParse(curRow[10], out npcHit); //lua?
-        int.TryParse(curRow[11], out npcDef); //lua?
-        int.TryParse(curRow[12], out npcRes); //lua?
-        int.TryParse(curRow[13], out npcAvoid); //lua?
-        int.TryParse(curRow[14], out npcAttackSpd); //lua?
-        int.TryParse(curRow[15], out npcIsMagicDamage); //lua?
-        int.TryParse(curRow[16], out npcAiType); //lua
-        int.TryParse(curRow[17], out npcGiveExp); //lua
-        int.TryParse(curRow[18], out npcDropType); //lua
-        int.TryParse(curRow[18], out npcMarkNumber); // NPC icon (only used with EVO style npc boxes)
-        int.TryParse(curRow[19], out npcDropMoney); //lua
+        int.TryParse(curRow[03], out npcWalkSpeed); //lua?
+        int.TryParse(curRow[04], out npcRunSpeed); //lua?
+        int.TryParse(curRow[05], out npcScale); //lua
+        int.TryParse(curRow[06], out npcRWeapon); //lua?
+        int.TryParse(curRow[07], out npcLWeapon); //lua?
+        int.TryParse(curRow[08], out npcLevel); //lua?
+        int.TryParse(curRow[09], out npcHp); //sql? lua?
+        int.TryParse(curRow[10], out npcAttack); //lua?
+        int.TryParse(curRow[11], out npcHit); //lua?
+        int.TryParse(curRow[12], out npcDef); //lua?
+        int.TryParse(curRow[13], out npcRes); //lua?
+        int.TryParse(curRow[14], out npcAvoid); //lua?
+        int.TryParse(curRow[15], out npcAttackSpd); //lua?
+        int.TryParse(curRow[16], out npcIsMagicDamage); //lua?
+        int.TryParse(curRow[17], out npcAiType); //lua
+        int.TryParse(curRow[18], out npcGiveExp); //lua
+        int.TryParse(curRow[19], out npcDropType); //lua
+        int.TryParse(curRow[19], out npcMarkNumber); // NPC icon (only used with EVO style npc boxes)
+        int.TryParse(curRow[20], out npcDropMoney); //lua
 
-        int.TryParse(curRow[20], out npcDropItem); //lua
-        int.TryParse(curRow[20], out npcUnionNumber); //sql
-        int.TryParse(curRow[21], out npcNeedSummonCount); //lua, used for unknown...
+        int.TryParse(curRow[21], out npcDropItem); //lua
+        int.TryParse(curRow[21], out npcUnionNumber); //sql
+        int.TryParse(curRow[22], out npcNeedSummonCount); //lua, used for unknown...
         // This is indexes into LIST_SELL.STB
         // We need to read LIST_SELL to convert these NPC tabs
-        int.TryParse(curRow[21], out npcSellTab0); //lua
-        int.TryParse(curRow[22], out npcSellTab1); //lua
-        int.TryParse(curRow[23], out npcSellTab2); //lua 
-        int.TryParse(curRow[24], out npcSellTab3); //lua
+        int.TryParse(curRow[22], out npcSellTab0); //lua
+        int.TryParse(curRow[23], out npcSellTab1); //lua
+        int.TryParse(curRow[24], out npcSellTab2); //lua 
+        int.TryParse(curRow[25], out npcSellTab3); //lua
 
-        int.TryParse(curRow[25], out npcCanTarget);
-        int.TryParse(curRow[26], out npcAttackRange); //lua?
-        int.TryParse(curRow[27], out npcType); //sql?
-        int.TryParse(curRow[28], out npcHitMaterialType);
-        int.TryParse(curRow[29], out npcFaceIcon); // NPC face icon (only used with EVO style npc boxes)
-        int.TryParse(curRow[29], out npcSummonMobType);
+        int.TryParse(curRow[26], out npcCanTarget);
+        int.TryParse(curRow[27], out npcAttackRange); //lua?
+        int.TryParse(curRow[28], out npcType); //sql?
+        int.TryParse(curRow[29], out npcHitMaterialType);
+        int.TryParse(curRow[30], out npcFaceIcon); // NPC face icon (only used with EVO style npc boxes)
+        int.TryParse(curRow[30], out npcSummonMobType);
 
-        int.TryParse(curRow[30], out npcNormalEffectSound);
-        int.TryParse(curRow[31], out npcAttackSound);
-        int.TryParse(curRow[32], out npcHitSound);
-        int.TryParse(curRow[33], out npcHandHitEffect);
-        int.TryParse(curRow[34], out npcDeadEffect);
-        int.TryParse(curRow[35], out npcDieSound);
-        int.TryParse(curRow[38], out npcQuestType); //lua
-        int.TryParse(curRow[39], out npcGlowColor);
+        int.TryParse(curRow[31], out npcNormalEffectSound);
+        int.TryParse(curRow[32], out npcAttackSound);
+        int.TryParse(curRow[33], out npcHitSound);
+        int.TryParse(curRow[34], out npcHandHitEffect);
+        int.TryParse(curRow[35], out npcDeadEffect);
+        int.TryParse(curRow[36], out npcDieSound);
+        int.TryParse(curRow[39], out npcQuestType); //lua
+        int.TryParse(curRow[40], out npcGlowColor);
 
         int.TryParse(curRow[42], out npcHeight);
         int.TryParse(curRow[43], out npcCreateEffect);

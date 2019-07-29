@@ -178,8 +178,6 @@ namespace convert_tool
         script += "--]]\n\n";
 #endif
 
-
-
         script += "use_restriction = " + usageRestrictions + "\n\n";
 
         if (reqTable.Count > 0)
@@ -253,8 +251,8 @@ function OnUnequip(entity)";
   end";
         }
 
-        script +=
-          @"
+                script +=
+                  @"
   return true
 end
 
@@ -268,6 +266,18 @@ end
 
 function OnUse(entity)
   return true
+end
+
+function GetAttackSpd()
+  return " + attackSpeed + @"
+end
+
+function GetMoveSpd()
+  return " + moveSpeed + @"
+end
+
+function GetMagic()
+  return " + magic + @"
 end";
 
         itemDesc = itemDesc.Replace("\"", "\\\"");

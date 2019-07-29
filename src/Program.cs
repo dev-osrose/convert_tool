@@ -84,7 +84,7 @@ namespace convert_tool
       var sqlFile = new System.IO.StreamWriter("srv_data\\item_db.sql", false);
       sqlFile.Close();
       
-      sqlFile = new System.IO.StreamWriter("srv_data\\mob_db.sql", false);
+      sqlFile = new System.IO.StreamWriter("srv_data\\skill_db.sql", false);
       sqlFile.Close();
       foreach (var itemDataFile in itemDataFiles)
       {
@@ -92,18 +92,18 @@ namespace convert_tool
         itemData.Load((ItemData.ItemType) (++typeIdx), stbRoot + itemDataFile.DataFile, stbRoot + itemDataFile.StringFile);
       }
 
-      //"list_skill.stb";
-      //"list_skill_s.stl";
+      const string skillStb = "list_skill.stb";
+      const string skillStl = "list_skill_s.stl";
+      var skillFile = new SkillData();
+      skillFile.Load(stbRoot + skillStb, stbRoot + skillStl);
+
+      const string npcStb = "list_npc.stb";
+      const string npcStl = "list_npc_s.stl";
+      var mobFile = new MobData();
+      mobFile.Load(stbRoot + npcStb, stbRoot + npcStl);
 
       var dataFile = new DataFile();
       dataFile.Load(stbRoot + zoneStb);
-
-      Console.Write("npc(<npc_lua_file>, <map_id>, <npc_id>, <x_pos>, <y_pos>, <angle>);\n");
-      Console.Write(
-        "mob(<mob_spawner_alias>, <map_id>, <mob_id>, <mob_count>, <spawner_limit>, <spawner_interval>, <spawner_range>, <x_pos>, <y_pos>, <angle>);\n");
-      Console.Write(
-        "warp_gate(<warp_alias>, <gate_to>, <this_gate_id>, <map_id>, <min_x_pos>, <min_y_pos>, <min_z_pos>, <max_x_pos>, <max_y_pos>, <max_z_pos>);\n\n");
-
       for (var i = 1; i < dataFile.RowCount; i++)
       {
         if (!dataFile[i][2].Contains(".zon")) continue;
@@ -112,12 +112,6 @@ namespace convert_tool
         var zone = new ZoneData();
         zone.Load(dataFile[i][2], i);
       }
-
-
-      const string npcStb = "list_npc.stb";
-      const string npcStl = "list_npc_s.stl";
-      var mobFile = new MobData();
-      mobFile.Load(stbRoot + npcStb, stbRoot + npcStl);
 
       Console.Write("Done extracting. Press any key to exit...\n");
       Console.ReadLine();

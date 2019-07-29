@@ -31,27 +31,31 @@ namespace convert_tool
 {
   public class SkillData
   {
-    public enum ItemType : int {
-      FACE = 1,
-      CAP,
-      BODY,
-      ARMS,
-      FOOT,
-      BACK,
-      JEWEL,
-      WEAPON,
-      SUB_WEAPON,
-      USEITEM,
-      JEMITEM,
-      NATURAL,
-      QUESTITEM,
-      PAT,
-      MAX_ITEM_TYPES
+    public enum SkillType : int {
+      INVALID_SKILL = 0,
+      PASSIVE_SKILL = 15,
+      MAX_SKILL_TYPES = 21
     };
 
-    public void Load(ItemType type = 0, string stbPath = null, string stlPath = null)
+    public enum TargetFilter : int
     {
-      if (type == 0 || stbPath == null || stlPath == null)
+      SELF = 0,
+      GROUP,
+      GUILD,
+      ALL_FRIENDLY,
+      MOB,
+      ALL_ENEMIES,
+      PC_ENEMIES,
+      ALL_PCs,
+      ALL_CHARACTERS,
+      DEAD_USERS,
+      ENEMY_MOB,
+      MAX_TARGET_TYPES
+    };
+
+    public void Load(string stbPath = null, string stlPath = null)
+    {
+      if (stbPath == null || stlPath == null)
         return;
 
       var stringFile = new StringTableFile();      
@@ -85,168 +89,151 @@ namespace convert_tool
           continue;
         }
 
-        var itemName = strTableRow.GetText();
-        var itemDesc = strTableRow.GetDescription();
+        var skillName = strTableRow.GetText();
+        var skillDesc = strTableRow.GetDescription();
 
-        if(itemName.Length == 0 || itemDesc.Length == 0) continue;
+        if(skillName.Length == 0 || skillDesc.Length == 0) continue;
 
         string script = "";
-        List<string> reqTable = new List<string>();
-        List<string> bonusTable = new List<string>();
-        double priceSell = 0.0f;
-        int subtype, priceBuy, weight, attack, defense, range, slots, equipJobs, groundViewModel, durability, attackSpeed, magic, moveSpeed, usageRestrictions;
-        subtype = priceBuy = weight = attack = defense = range = slots = equipJobs = groundViewModel = durability = attackSpeed = magic = moveSpeed = usageRestrictions = 0;
-        
-        int.TryParse(curRow[4], out usageRestrictions);
-        int.TryParse(curRow[5], out subtype);
-        int.TryParse(curRow[6], out priceBuy);
-        double.TryParse(curRow[7], out priceSell);
-        int.TryParse(curRow[8], out weight);
-
-        int.TryParse(curRow[11], out groundViewModel);
-        int.TryParse(curRow[17], out equipJobs);
-
-        try
-        {
-          for (var reqIndex = 0; reqIndex < 2; reqIndex++)
-          {
-            var reqType = curRow[(20 + (reqIndex * 2))];
-            var value = curRow[(21 + (reqIndex * 2))];
-
-            if (reqType.Length == 0) continue;
-
-            var reqId = "reqTable[" + (reqIndex + 1) + "]";
-            reqTable.Add(reqId + " = {}\n" +
-                         reqId + ".type = " + reqType + "\n" +
-                         reqId + ".value = " + value + "\n");
-          }
-
-          for (var bonusIndex = 0; bonusIndex < 2; bonusIndex++)
-          {
-            var bonusType = curRow[(25 + (bonusIndex * 3))];
-            var value = curRow[(26 + (bonusIndex * 3))];
-
-            if (bonusType.Length == 0) continue;
-
-            var bonusId = "bonusTable[" + (bonusIndex + 1) + "]";
-            reqTable.Add(bonusId + " = {}\n" +
-                         bonusId + ".type = " + bonusType + "\n" +
-                         bonusId + ".value = " + value + "\n");
-          }
-
-          int.TryParse(curRow[30], out durability);
-          int.TryParse(curRow[32], out defense);
-
-          switch (type)
-          {
-            case ItemType.BACK:
-            case ItemType.FOOT:
-            {
-              int.TryParse(curRow[34], out moveSpeed);
-              break;
-            }
-            case ItemType.WEAPON: 
-            {
-              int.TryParse(curRow[31], out slots);
-              int.TryParse(curRow[34], out range);
-              int.TryParse(curRow[36], out attack);
-              int.TryParse(curRow[37], out attackSpeed);
-              int.TryParse(curRow[38], out magic);
-              break;
-            }
-            case ItemType.SUB_WEAPON: 
-            {
-              int.TryParse(curRow[31], out slots);
-              break;
-            }
-            default:
-              break;
-          }
-        }
-        catch (ArgumentOutOfRangeException e)
-        {
-          //Console.WriteLine(e);
-          //Shit borked..... naaaa just this STB prob doesn't have extra data in it
-        }
-
-#if OUTPUT_STB_DATA_COMMENT
-        script += "--[[ ";
-        for (var j = 0; j < dataFile.ColumnCount - 1; j++)
-        {
-          script += "COLUMN " + j+1 + " =='" + curRow[j+1] + "'\n";
-        }
-        script += "--]]\n\n";
-#endif
+        int level, type, range, class_, power, pointsToLevelUp, zulyNeededToLevelUp, usageAttribute;
+        level = type = range = class_ = power = pointsToLevelUp = zulyNeededToLevelUp = usageAttribute = 0;
 
 
+//enum
+//{
+//  SKILL_TYPE_01 = 1,
+//  SKILL_TYPE_02,
+//  SKILL_TYPE_03,
+//  SKILL_TYPE_04,
+//  SKILL_TYPE_05,
+//  SKILL_TYPE_06,
+//  SKILL_TYPE_07,
+//  SKILL_TYPE_08,
+//  SKILL_TYPE_09,
+//  SKILL_TYPE_10,
+//  SKILL_TYPE_11,
+//  SKILL_TYPE_12,
+//  SKILL_TYPE_13,
+//  SKILL_TYPE_14,
+//  SKILL_TYPE_15,
+//  // ÆÐ½Ãºê ½ºÅ³
+//  SKILL_TYPE_PASSIVE = SKILL_TYPE_15,
+//  SKILL_TYPE_16,
+//  // Emotion
+//  SKILL_TYPE_17,
+//  // Self & damage
+//  SKILL_TYPE_18,
+//  // warp skill
+//  SKILL_TYPE_19,
+//  SKILL_TYPE_20,
+//};
 
-        script += "use_restriction = " + usageRestrictions + "\n";
+//SKILL_1LEV_INDEX(S)					      [ S ][  1 ]
+//SKILL_LEVEL(S)						        [ S ][  2 ]
+//SKILL_NEED_LEVELUPPOINT(S)	      [ S ][  3 ]
+//SKILL_TAB_TYPE(S)					        [ S ][  4 ]
+//SKILL_TYPE( I )						        [ I ][  5 ]
+//SKILL_DISTANCE( I )					      [ I ][  6 ]
+//SKILL_WARP_PLANET_NO( I )		      [ I ][  6 ]
+//SKILL_CLASS_FILTER( I )			      [ I ][  7 ]
+//SKILL_SCOPE(S)						        [ S ][  8 ]
+//SKILL_POWER(S)						        [ S ][  9 ]
+//SKILL_ITEM_MAKE_NUM		            SKILL_POWER
+//SKILL_HARM( I )						        [ I ][ 10 ]
+//SKILL_STATE_STB( I,C )			      [ I ][ 11+C ]
+//SKILL_STATE_STB1( I )				      [ I ][ 11 ]
+//SKILL_STATE_STB2( I )				      [ I ][ 12 ]
+//SKILL_SUCCESS_RATIO( I )		      [ I ][ 13 ]		
+//SKILL_DURATION( I )					      [ I ][ 14 ]
+//SKILL_DAMAGE_TYPE(S)				      [ S ][ 15 ]
+//SKILL_USE_PROPERTY_CNT			      2
+//  SKILL_USE_PROPERTY(S,T)			      [ S ][ 16+(T)*2 ]
+//  SKILL_USE_VALUE(S,T)				      [ S ][ 17+(T)*2 ]
+//SKILL_RELOAD_TIME(S)				      [ S ][ 20 ]
+//SKILL_INCREASE_ABILITY_CNT			  2
+//  SKILL_INCREASE_ABILITY(S,T)			  [ S ][ 21+(T)*3 ]
+//  SKILL_INCREASE_ABILITY_VALUE(S,T)	[ S ][ 22+(T)*3 ]
+//SKILL_CHANGE_ABILITY_RATE(S,T)		[ S ][ 23+(T)*3 ]
+//SKILL_WARP_ZONE_NO( S )				    [ S ][ 21 ]
+//SKILL_WARP_ZONE_XPOS( S )			    [ S ][ 22 ]
+//SKILL_WARP_ZONE_YPOS( S )			    [ S ][ 23 ]
+//SKILL_RELOAD_TYPE(S)				      [ S ][ 27 ]
+//SKILL_SUMMON_PET(S)					      [ S ][ 28 ]
+//SKILL_ACTION_MODE(S)				      [ S ][ 29 ]
+//SKILL_NEED_WEAPON_CNT				      5
+//  SKILL_NEED_WEAPON(S,T)				  [ S ][ 30+(T) ]
+//SKILL_AVAILBLE_CLASS_SET(S)		    [ S ][ 35 ]
+//SKILL_AVAILBLE_UNION_CNT			    3
+//  SKILL_AVAILBLE_UNION(S,T)			  [ S ][ 36+(T) ]
+//SKILL_NEED_SKILL_CNT				      3
+//  SKILL_NEED_SKILL_INDEX(S,T)		  [ S ][ 39+(T)*2 ]
+//  SKILL_NEDD_SKILL_LEVEL(S,T)		  [ S ][ 40+(T)*2 ]
+//SKILL_NEED_ABILITY_TYPE_CNT		    2
+//  SKILL_NEED_ABILITY_TYPE(S,T)	  [ S ][ 45+(T)*2 ]
+//  SKILL_NEED_ABILITY_VALUE(S,T)	  [ S ][ 46+(T)*2 ]
+//SKILL_SCRIPT1( I )					      [ I ][ 49 ]
+//SKILL_RESERVE_02( I )				      [ I ][ 50 ]
+//SKILL_LEVELUP_NEED_ZULY( I )		  [ I ][ 85 ]
+//SKILL_ATTRIBUTE( I )				      [ I ][ 86 ]
+//SKILL_ATTRIBUTE_AVATAR				1
+//SKILL_ATTRIBUTE_CART				  2
+//SKILL_ATTRIBUTE_CASTLEGEAR		4
 
-        foreach (var requirement in reqTable)
-        {
-          script += requirement;
-        }
+//-----------------------------------
+//Graphics related
+//SKILL_ICON_NO( I )					      [ I ][ 51 ]
+//SKILL_ANI_CASTING(S)				      [ S ][ 52 ]
+//SKILL_ANI_CASTING_SPEED(S)		    [ S ][ 53 ]
+//SKILL_ANI_CASTING_REPEAT(S)		    [ S ][ 54 ]
+//SKILL_ANI_CASTING_REPEAT_CNT(S)		[ S ][ 55 ]
+//SKILL_CASTING_EFFECT_CNT			    4
+//  SKILL_CASTING_EFFECT( I,T )			  [ I ][ 56 + (T * 3) ]
+//  SKILL_CASTING_EFFECT_POINT( I,T )	[ I ][ 57 + (T * 3) ]
+//  SKILL_CASTING_SOUND( I,T )			  [ I ][ 58 + (T * 3) ]
+//SKILL_ANI_ACTION_TYPE(S)			    [ S ][ 68 ]
+//SKILL_ANI_ACTION_SPEED(S)			    [ S ][ 69 ]
+//SKILL_ANI_HIT_COUNT(S)				    [ S ][ 70 ]
+//SKILL_BULLET_NO( I )				      [ I ][ 71 ]
+//SKILL_BULLET_LINKED_POINT( I )		[ I ][ 72 ]
+//SKILL_BULLET_FIRE_SOUND( I )		  [ I ][ 73 ]
+//SKILL_HIT_EFFECT( I )				      [ I ][ 74 ]
+//SKILL_HIT_EFFECT_LINKED_POINT( I )	[ I ][ 75 ]
+//SKILL_HIT_SOUND( I )				        [ I ][ 76 ]
+//SKILL_HIT_DUMMY_EFFECT_CNT			    2
+//  SKILL_HIT_DUMMY_EFFECT( I, T )			          [ I ][ 77 + 3*T ]
+//  SKILL_HIT_DUMMY_EFFECT_LINKED_POINT( I, T )		[ I ][ 78 + 3*T ]
+//  SKILL_HIT_DUMMY_SOUND( I, T )					        [ I ][ 79 + 3*T ]
+//SKILL_AREA_HIT_EFFECT( I )			  [ I ][ 83 ]
+//SKILL_AREA_HIT_SOUND( I )			    [ I ][ 84 ]
 
-        foreach (var bonus in bonusTable)
-        {
-          script += bonus;
-        }
+        int.TryParse(curRow[3], out level);
+        int.TryParse(curRow[4], out pointsToLevelUp);
+        int.TryParse(curRow[6], out type);
+        int.TryParse(curRow[7], out range);
+        int.TryParse(curRow[8], out class_);
+        int.TryParse(curRow[10], out power);
+        script = curRow[50]; // not used by any skill
+        int.TryParse(curRow[86], out zulyNeededToLevelUp);
+        int.TryParse(curRow[87], out usageAttribute);
 
-        script +=
-          @"
-function OnInit()
-  return true
-end
+//#if OUTPUT_STB_DATA_COMMENT
+//        script += "--[[ ";
+//        for (var j = 0; j < dataFile.ColumnCount - 1; j++)
+//        {
+//          script += "COLUMN " + j+1 + " =='" + curRow[j+1] + "'\n";
+//        }
+//        script += "--]]\n\n";
+//#endif
 
-function OnCreate()
-  return true
-end
-
-function OnDelete()
-  return true
-end
-
-function OnEquip(entity)
-  for i, data in ipairs(reqTable) do
-    if data.value > getAttr(entity, data.type) then
-      return false
-    end
-  end
-
-  for i, data in ipairs(bonusTable) do
-    addBonusAttr(entity, data.type, data.value)
-  end
-  return true
-end
-
-function OnUnequip(entity)
-  for i, data in ipairs(bonusTable) do
-    removeBonusAttr(entity, data.type, data.value)
-  end
-  return true
-end
-
-function OnDrop(entity)
-  return true
-end
-
-function OnPickup(entity)
-  return true
-end
-
-function OnUse(entity)
-  return true
-end";
-
-        itemDesc = itemDesc.Replace("\"", "\\\"");
+        skillDesc = skillDesc.Replace("\"", "\\\"");
         string sqlEntry =
-          "REPLACE into item_db(id, name, `desc`, type, subtype, price_buy, price_sell, weight, attack, defense, `range`, slots, equip_jobs, view_id, script) ";
-        sqlEntry += "values(" + i + ", \"" + itemName + "\", \"" + itemDesc + "\", " + (int)(type) + ", " + subtype + ", " + priceBuy + ", " + priceSell + ", " + weight + ", " + attack + ", " + defense + ", " + range + ", " + slots + ", " + equipJobs + ", " + groundViewModel + ", \"" + script + "\");";
+          "REPLACE into skill_db(id, name, `desc`, level, type, `range`, class_, power, script) ";
+        sqlEntry += "values(" + i + ", \"" + skillName + "\", \"" + skillDesc + "\", " + (int)(level) + ", " + (int)(type) + ", " + range + ", " + class_ + ", " + power + ", \"" + script + "\");";
 
         sqlFileList.Add(sqlEntry);
       }
 
-      var sqlFile = new System.IO.StreamWriter("srv_data\\item_db.sql", true);
+      var sqlFile = new System.IO.StreamWriter("srv_data\\skill_db.sql", true);
       using (sqlFile)
       {
         foreach (var itemLine in sqlFileList)
