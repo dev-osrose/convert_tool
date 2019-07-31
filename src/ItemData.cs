@@ -178,8 +178,6 @@ namespace convert_tool
         script += "--]]\n\n";
 #endif
 
-        script += "use_restriction = " + usageRestrictions + "\n\n";
-
         if (reqTable.Count > 0)
         {
           script += "reqTable = {}\n";
@@ -278,6 +276,10 @@ end
 
 function GetMagic()
   return " + magic + @"
+end
+
+function GetUsageRestrictions()
+  return " + usageRestrictions + @"
 end";
 
         itemDesc = itemDesc.Replace("\"", "\\\"");
