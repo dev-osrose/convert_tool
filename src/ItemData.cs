@@ -285,7 +285,7 @@ end";
         itemDesc = itemDesc.Replace("\"", "\\\"");
         string sqlEntry =
           "REPLACE into item_db(id, name, `desc`, type, subtype, price_buy, price_sell, weight, attack, defense, `range`, slots, equip_jobs, view_id, script) ";
-        sqlEntry += "values(" + i + ", \"" + itemName + "\", \"" + itemDesc + "\", " + (int)(type) + ", " + subtype + ", " + priceBuy + ", " + priceSell + ", " + weight + ", " + attack + ", " + defense + ", " + range + ", " + slots + ", " + equipJobs + ", " + groundViewModel + ", \"" + script + "\");";
+        sqlEntry += "values(" + i + ", \"" + itemName + "\", \"" + itemDesc + "\", " + (int)(type) + ", " + subtype + ", " + priceBuy + ", " + priceSell + ", " + weight + ", " + attack + ", " + defense + ", " + range.ToString("G", CultureInfo.InvariantCulture) + ", " + slots + ", " + equipJobs + ", " + groundViewModel + ", \"" + script + "\");";
 
         sqlFileList.Add(sqlEntry);
       }
