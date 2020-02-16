@@ -228,7 +228,7 @@ namespace convert_tool
         skillDesc = skillDesc.Replace("\"", "\\\"");
         string sqlEntry =
           "REPLACE into skill_db(id, name, `desc`, level, type, `range`, class_, power, script) ";
-        sqlEntry += "values(" + i + ", \"" + skillName + "\", \"" + skillDesc + "\", " + (int)(level) + ", " + (int)(type) + ", " + range + ", " + class_ + ", " + power + ", \"" + script + "\");";
+        sqlEntry += "values(" + i + ", \"" + skillName + "\", \"" + skillDesc + "\", " + (int)(level) + ", " + (int)(type) + ", " + range.ToString("G", CultureInfo.InvariantCulture) + ", " + class_ + ", " + power + ", \"" + script + "\");";
 
         sqlFileList.Add(sqlEntry);
       }
