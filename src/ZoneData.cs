@@ -116,7 +116,7 @@ namespace convert_tool
 
       if (reviveMap.Length > 0)
       {
-        spawnList.Add("revive_point(" + reviveMap + ", " + (reviveX * 1000.0f) + ", " + (reviveY * 10000.0f) + ");\n");
+        spawnList.Add("revive_point(" + reviveMap.ToString("G", CultureInfo.InvariantCulture) + ", " + (reviveX * 1000.0f).ToString("G", CultureInfo.InvariantCulture) + ", " + (reviveY * 10000.0f).ToString("G", CultureInfo.InvariantCulture) + ");\n");
       }
 
       foreach (var spawnPoint in zoneFile.SpawnPoints)
@@ -127,11 +127,11 @@ namespace convert_tool
 
         if (spawnPoint.Name.Contains("start"))
         {
-          spawnList.Add("start_point(" + mapId + ", " + destCoords.X + ", " + destCoords.Y + ");\n");
+          spawnList.Add("start_point(" + mapId.ToString("G", CultureInfo.InvariantCulture) + ", " + destCoords.X.ToString("G", CultureInfo.InvariantCulture) + ", " + destCoords.Y.ToString("G", CultureInfo.InvariantCulture) + ");\n");
         }
         else
         {
-          spawnList.Add("respawn_point(" + mapId + ", " + destCoords.X + ", " + destCoords.Y + ");\n");
+          spawnList.Add("respawn_point(" + mapId.ToString("G", CultureInfo.InvariantCulture) + ", " + destCoords.X.ToString("G", CultureInfo.InvariantCulture) + ", " + destCoords.Y.ToString("G", CultureInfo.InvariantCulture) + ");\n");
         }
       }
     }
@@ -145,29 +145,29 @@ namespace convert_tool
         {
 
           mobList.Add("mob(\"\", "
-                        + normalMobs.Monster.ToString() + ", "
-                        + normalMobs.Count.ToString() + ", "
-                        + mobSpawns.Limit.ToString() + ", "
-                        + mobSpawns.Interval.ToString() + ", "
-                        + mobSpawns.Range.ToString() + ", "
-                        + mapId.ToString() + ", "
-                        + (adjPosCoords.X).ToString() + ", "
-                        + (adjPosCoords.Y).ToString() + ", "
-                        + (adjPosCoords.Z).ToString() + ");\n");
+                        + normalMobs.Monster.ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + normalMobs.Count.ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + mobSpawns.Limit.ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + mobSpawns.Interval.ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + mobSpawns.Range.ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + mapId.ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + (adjPosCoords.X).ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + (adjPosCoords.Y).ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + (adjPosCoords.Z).ToString("G", CultureInfo.InvariantCulture) + ");\n");
         }
 
         foreach (var tacticalMobs in mobSpawns.TacticalSpawnPoints)
         {
           mobList.Add("mob(\"\", "
-                        + tacticalMobs.Monster.ToString() + ", "
-                        + tacticalMobs.Count.ToString() + ", "
-                        + mobSpawns.Limit.ToString() + ", "
-                        + mobSpawns.Interval.ToString() + ", "
-                        + mobSpawns.Range.ToString() + ", "
-                        + mapId.ToString() + ", "
-                        + (adjPosCoords.X).ToString() + ", "
-                        + (adjPosCoords.Y).ToString() + ", "
-                        + (adjPosCoords.Z).ToString() + ");\n");
+                        + tacticalMobs.Monster.ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + tacticalMobs.Count.ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + mobSpawns.Limit.ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + mobSpawns.Interval.ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + mobSpawns.Range.ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + mapId.ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + (adjPosCoords.X).ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + (adjPosCoords.Y).ToString("G", CultureInfo.InvariantCulture) + ", "
+                        + (adjPosCoords.Z).ToString("G", CultureInfo.InvariantCulture) + ");\n");
         }
       }
     }
@@ -189,13 +189,13 @@ namespace convert_tool
         }
 
         var adjPosCoords = new Vector3(((npc.Position.X + 520000.00f) / 100.0f), ((npc.Position.Y + 520000.00f) / 100.0f), ((npc.Position.Z) / 100.0f));
-        npcList.Add("npc(\"" + dialogId + "\", "
-                      + npc.ObjectID.ToString() + ", "
-                      + mapId.ToString() + ", "
-                      + (adjPosCoords.X).ToString() + ", "
-                      + (adjPosCoords.Y).ToString() + ", "
-                      + (adjPosCoords.Z).ToString() + ", "
-                      + (npc.Rotation.Angle * (180.0 / Math.PI)) + ");\n");
+        npcList.Add("npc(\"" + dialogId.ToString("G", CultureInfo.InvariantCulture) + "\", "
+                      + npc.ObjectID.ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + mapId.ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + (adjPosCoords.X).ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + (adjPosCoords.Y).ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + (adjPosCoords.Z).ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + (npc.Rotation.Angle * (180.0 / Math.PI)).ToString("G", CultureInfo.InvariantCulture) + ");\n");
       }
     }
 
@@ -258,17 +258,17 @@ namespace convert_tool
         var boundingBox = BoundingBox.FromPoints(vectorPositions);
 
         warpList.Add("warp_gate(\"\", " 
-                      + warpDataFile[warpGate.WarpID][2].ToString() + ", "
-                      + (destCoords.X) + ", "
-                      + (destCoords.Y) + ", "
-                      + (destCoords.Z) + ", "
-                      + mapId.ToString() + ", "
-                      + (boundingBox.Minimum.X) + ", "
-                      + (boundingBox.Minimum.Y) + ", "
-                      + (boundingBox.Minimum.Z) + ", "
-                      + (boundingBox.Maximum.X) + ", "
-                      + (boundingBox.Maximum.Y) + ", "
-                      + (boundingBox.Maximum.Z) + ");\n");
+                      + warpDataFile[warpGate.WarpID][2].ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + (destCoords.X).ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + (destCoords.Y).ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + (destCoords.Z).ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + mapId.ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + (boundingBox.Minimum.X).ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + (boundingBox.Minimum.Y).ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + (boundingBox.Minimum.Z).ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + (boundingBox.Maximum.X).ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + (boundingBox.Maximum.Y).ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + (boundingBox.Maximum.Z).ToString("G", CultureInfo.InvariantCulture) + ");\n");
       }
     }
 
