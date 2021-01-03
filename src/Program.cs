@@ -25,7 +25,12 @@ using Revise.Files.STB;
 
 namespace convert_tool
 {
-  internal class Program
+    static class Globals
+    {
+        public const string stbroot = "../3DDATA/stb/";
+    }
+
+    internal class Program
   {
     private struct ItemInfo
     {
@@ -47,7 +52,7 @@ namespace convert_tool
 
     private static void Main(string[] args)
     {
-      const string stbRoot = "./3DDATA/stb/";
+      
       const string zoneStb = "list_zone.stb";
 
       var itemDataFiles = new ItemInfo[14];
@@ -89,28 +94,28 @@ namespace convert_tool
       foreach (var itemDataFile in itemDataFiles)
       {
         var itemData = new ItemData();
-        itemData.Load((ItemData.ItemType) (++typeIdx), stbRoot + itemDataFile.DataFile, stbRoot + itemDataFile.StringFile);
+        itemData.Load((ItemData.ItemType) (++typeIdx), Globals.stbroot + itemDataFile.DataFile, Globals.stbroot + itemDataFile.StringFile);
       }
 
       const string skillStb = "list_skill.stb";
       const string skillStl = "list_skill_s.stl";
       var skillFile = new SkillData();
-      skillFile.Load(stbRoot + skillStb, stbRoot + skillStl);
+      skillFile.Load(Globals.stbroot + skillStb, Globals.stbroot + skillStl);
 
       const string npcStb = "list_npc.stb";
       const string npcStl = "list_npc_s.stl";
       var mobFile = new MobData();
-      mobFile.Load(stbRoot + npcStb, stbRoot + npcStl);
+      mobFile.Load(Globals.stbroot + npcStb, Globals.stbroot + npcStl);
 
       var dataFile = new DataFile();
-      dataFile.Load(stbRoot + zoneStb);
+      dataFile.Load(Globals.stbroot + zoneStb);
       for (var i = 1; i < dataFile.RowCount; i++)
       {
-        if (!dataFile[i][2].Contains(".zon")) continue;
+        if (!("../"+dataFile[i][2]).Contains(".zon")) continue;
 
         Console.Write("Attempting to load \"" + dataFile[i][1] + "\" - ");
         var zone = new ZoneData();
-        zone.Load(dataFile[i][2], i);
+        zone.Load("../" + dataFile[i][2], i);
       }
 
       Console.Write("Done extracting. Press any key to exit...\n");
