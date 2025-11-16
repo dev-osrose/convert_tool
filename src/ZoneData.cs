@@ -20,6 +20,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -103,18 +104,18 @@ namespace convert_tool
 
     private static void ExtractSpawnPoints(int mapId, ZoneFile zoneFile, List<string> spawnList)
     {
-      const string zoneStb = "./3DDATA/stb/list_zone.stb";
+      const string zoneStb = Globals.stbroot + "list_zone.stb";
 
       var zoneDataFile = new DataFile();
       zoneDataFile.Load(zoneStb);
 
       var curMapRow = zoneDataFile[mapId];
 
-      var reviveMap = curMapRow[32];
+      bool isParsable = int.TryParse(curMapRow[32], out var reviveMap);
       double.TryParse(curMapRow[33], out var reviveX);
       double.TryParse(curMapRow[34], out var reviveY);
 
-      if (reviveMap.Length > 0)
+      if (isParsable)
       {
         spawnList.Add("revive_point(" + reviveMap.ToString("G", CultureInfo.InvariantCulture) + ", " + (reviveX * 1000.0f).ToString("G", CultureInfo.InvariantCulture) + ", " + (reviveY * 10000.0f).ToString("G", CultureInfo.InvariantCulture) + ");\n");
       }
@@ -177,7 +178,7 @@ namespace convert_tool
       foreach (var npc in ifo.NPCs)
       {
         var eventDataFile = new DataFile();
-        eventDataFile.Load("./3DDATA/stb/list_event.stb");
+        eventDataFile.Load(Globals.stbroot + "list_event.stb");
         int dialogId = 0;
         for (int i = 0; i < eventDataFile.RowCount; i++)
         {
@@ -201,10 +202,10 @@ namespace convert_tool
 
     private static void ExtractWarpGates(List<string> warpList, int mapId, MapDataFile ifo)
     {
-      const string warpStb = "./3DDATA/stb/warp.stb";
-      const string zoneStb = "./3DDATA/stb/list_zone.stb";
-      const string warpGateModel = "./3DDATA/special/warp_gate01/warp.zms";
-      const string decoSpecialList = "./3DDATA/special/list_deco_special.zsc";
+      const string warpStb = Globals.stbroot + "warp.stb";
+      const string zoneStb = Globals.stbroot + "list_zone.stb";
+      const string warpGateModel = Globals.stbroot + "../special/warp_gate01/warp.zms";
+      const string decoSpecialList = Globals.stbroot +"../special/list_deco_special.zsc";
 
             var zoneDataFile = new DataFile();
       zoneDataFile.Load(zoneStb);
@@ -223,10 +224,10 @@ namespace convert_tool
       foreach (var warpGate in ifo.WarpPoints)
       {
         var destMapId = int.Parse(warpDataFile[warpGate.WarpID][2]);
-        if (zoneDataFile[destMapId][2].ToString().Contains(".zon"))
+        if (("../" + zoneDataFile[destMapId][2].ToString()).Contains(".zon"))
         {
           ZoneFile zoneFile = new ZoneFile();
-          zoneFile.Load(zoneDataFile[destMapId][2].ToString()); // Load the zon file
+          zoneFile.Load("../" + zoneDataFile[destMapId][2].ToString()); // Load the zon file
 
           foreach (var spawnPoint in zoneFile.SpawnPoints)
           {
@@ -258,7 +259,7 @@ namespace convert_tool
         var boundingBox = BoundingBox.FromPoints(vectorPositions);
 
         warpList.Add("warp_gate(\"\", " 
-                      + warpDataFile[warpGate.WarpID][2].ToString("G", CultureInfo.InvariantCulture) + ", "
+                      + warpDataFile[warpGate.WarpID][2] + ", "
                       + (destCoords.X).ToString("G", CultureInfo.InvariantCulture) + ", "
                       + (destCoords.Y).ToString("G", CultureInfo.InvariantCulture) + ", "
                       + (destCoords.Z).ToString("G", CultureInfo.InvariantCulture) + ", "

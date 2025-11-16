@@ -21,6 +21,7 @@
 
 //#define OUTPUT_STB_DATA_COMMENT
 using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.IO;
 using Revise.Files.STB;
@@ -94,14 +95,15 @@ namespace convert_tool
         List<string> reqTable = new List<string>();
         List<string> bonusTable = new List<string>();
         double priceSell = 0.0f;
-        int subtype, priceBuy, weight, attack, defense, range, slots, equipJobs, groundViewModel, durability, attackSpeed, magic, moveSpeed, usageRestrictions;
-        subtype = priceBuy = weight = attack = defense = range = slots = equipJobs = groundViewModel = durability = attackSpeed = magic = moveSpeed = usageRestrictions = 0;
+        int subtype, priceBuy, weight, quality, attack, defense, range, slots, equipJobs, groundViewModel, durability, attackSpeed, magic, moveSpeed, usageRestrictions;
+        subtype = priceBuy = weight = quality = attack = defense = range = slots = equipJobs = groundViewModel = durability = attackSpeed = magic = moveSpeed = usageRestrictions = 0;
         
         int.TryParse(curRow[4], out usageRestrictions);
         int.TryParse(curRow[5], out subtype);
         int.TryParse(curRow[6], out priceBuy);
         double.TryParse(curRow[7], out priceSell);
         int.TryParse(curRow[8], out weight);
+        int.TryParse(curRow[9], out quality);
 
         int.TryParse(curRow[11], out groundViewModel);
         int.TryParse(curRow[17], out equipJobs);
@@ -144,6 +146,11 @@ namespace convert_tool
             {
               int.TryParse(curRow[34], out moveSpeed);
               break;
+            }
+            case ItemType.PAT:
+            {
+                int.TryParse(curRow[34], out moveSpeed);
+                break;
             }
             case ItemType.WEAPON: 
             {
@@ -284,8 +291,8 @@ end";
 
         itemDesc = itemDesc.Replace("\"", "\\\"");
         string sqlEntry =
-          "REPLACE into item_db(id, name, `desc`, type, subtype, price_buy, price_sell, weight, attack, defense, `range`, slots, equip_jobs, view_id, script) ";
-        sqlEntry += "values(" + i + ", \"" + itemName + "\", \"" + itemDesc + "\", " + (int)(type) + ", " + subtype + ", " + priceBuy + ", " + priceSell + ", " + weight + ", " + attack + ", " + defense + ", " + range.ToString("G", CultureInfo.InvariantCulture) + ", " + slots + ", " + equipJobs + ", " + groundViewModel + ", \"" + script + "\");";
+          "REPLACE into item_db(id, name, `desc`, type, subtype, price_buy, price_sell, weight, quality, attack, defense, `range`, slots, equip_jobs, view_id, script) ";
+        sqlEntry += "values(" + i + ", \"" + itemName + "\", \"" + itemDesc + "\", " + (int)(type) + ", " + subtype + ", " + priceBuy + ", " + priceSell + ", " + weight + ", " + quality + ", " + attack + ", " + defense + ", " + range.ToString("G", CultureInfo.InvariantCulture) + ", " + slots + ", " + equipJobs + ", " + groundViewModel + ", \"" + script + "\");";
 
         sqlFileList.Add(sqlEntry);
       }
